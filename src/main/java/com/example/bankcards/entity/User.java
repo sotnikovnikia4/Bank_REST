@@ -23,6 +23,11 @@ public class User {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
+    @Column(nullable = false, unique = true)
+    private String login;
+
+    private String password;
+
     @Column(nullable = false)
     private String name;
 }
