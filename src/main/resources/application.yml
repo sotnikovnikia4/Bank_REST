@@ -19,3 +19,7 @@ jwt:
   secret: SECRET
   issuer: localhost
   days_until_expiration: 1
+
+encryption:
+  password: "password"
+  salt: "saltsaltsaltsalt"

@@ -25,15 +25,13 @@ public class AuthController {
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<TokenDTO> register(@RequestBody @Valid CreationUserDTO creationUserDTO, BindingResult bindingResult){
+    public TokenDTO register(@RequestBody @Valid CreationUserDTO creationUserDTO, BindingResult bindingResult){
         registrationValidator.validate(creationUserDTO, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ValidationException(errorMessageCreator.createErrorMessage(bindingResult));
         }
 
-        TokenDTO tokenDTO = authorizationService.register(creationUserDTO);
-
-        return ResponseEntity.ok(tokenDTO);
+        return authorizationService.register(creationUserDTO);
     }
 
     @PostMapping("/login")

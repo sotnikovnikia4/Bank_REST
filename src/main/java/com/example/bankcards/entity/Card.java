@@ -20,19 +20,19 @@ import java.util.UUID;
 public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID uuid;
+    private UUID id;
 
     @Column(nullable = false, unique = true)
     private String encryptedCardNumber;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 
     @Column(nullable = false)
     private LocalDate expiresAt;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Status status;
 

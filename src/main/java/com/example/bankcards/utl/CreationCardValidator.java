@@ -1,0 +1,38 @@
+package com.example.bankcards.utl;
+
+import com.example.bankcards.dto.CreationCardDTO;
+import com.example.bankcards.entity.User;
+import com.example.bankcards.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+@Component
+@RequiredArgsConstructor
+public class CreationCardValidator  implements Validator {
+    private final UserService userService;
+
+    @Override
+    public boolean supports(Class<?> clazz) {
+        return CreationCardDTO.class.isAssignableFrom(clazz);
+    }
+
+    @Override
+    public void validate(Object target, Errors errors) {
+        CreationCardDTO creationCardDTO = (CreationCardDTO) target;
+
+        Optional<User> foundUser = userService.getUserById(creationCardDTO.getOwnerId());
+        if (foundUser.isEmpty()) {
+            errors.rejectValue("ownerId", "", "Such user does not exist");
+        }
+
+        LocalDate now = LocalDate.now();
+        if(now.isAfter(creationCardDTO.getExpiresAt())){
+            errors.rejectValue("expiresAt", "", "Value is less than current date");
+        }
+    }
+}

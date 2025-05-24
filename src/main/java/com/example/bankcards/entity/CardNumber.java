@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardNumber {
-    private int[] number;
+    private byte[] number;
 
-    private String getMask(){
+    public String getMask(){
         StringBuffer sb = new StringBuffer(16);
 
         sb.append("**** **** **** ");

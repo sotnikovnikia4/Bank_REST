@@ -1,0 +1,17 @@
+package com.example.bankcards.config;
+
+import com.example.bankcards.utl.EncryptionHelper;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.crypto.SecretKey;
+
+@Configuration
+public class EncryptionConfig {
+
+    @Bean
+    public SecretKey secretKey(EncryptionHelper encryptionHelper, @Value("${encryption.password}") String password, @Value("${encryption.salt}") String salt) {
+        return encryptionHelper.generateKey(password.toCharArray(), salt.getBytes());
+    }
+}
