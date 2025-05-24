@@ -1,6 +1,5 @@
 package com.example.bankcards.security;
 
-import com.sotnikov.ListToDoBackend.services.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;

@@ -15,11 +15,11 @@ import java.util.Date;
 @Component
 public class JWTUtil {
 
-    @Value("${jwt_secret}")
+    @Value("${jwt.secret}")
     private String secretWord;
-    @Value("${token_issuer}")
+    @Value("${jwt.issuer}")
     private String issuer;
-    @Value("${jwt_days_until_expiration}")
+    @Value("${jwt.days_until_expiration}")
     private int expirationDays;
     private final String subject = "User details";
 

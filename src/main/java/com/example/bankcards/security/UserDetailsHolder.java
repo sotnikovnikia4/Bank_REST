@@ -1,6 +1,7 @@
 package com.example.bankcards.security;
 
 import com.example.bankcards.entity.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -13,5 +14,14 @@ public final class UserDetailsHolder {
 
     public UserDetails getUserDetailsSecurityContext(){
         return (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public User getUserFromPrincipal(Object principal){
+        if(principal instanceof UserDetailsImpl){
+            return ((UserDetailsImpl)principal).getUser();
+        }
+        else{
+            throw new RuntimeException("Error getting user from principal");
+        }
     }
 }

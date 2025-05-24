@@ -32,7 +32,7 @@ public class Card {
     @Column(nullable = false)
     private LocalDate expiresAt;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Status status;
 

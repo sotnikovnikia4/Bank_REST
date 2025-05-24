@@ -13,4 +13,9 @@ spring:
 
   liquibase:
     change-log: classpath:db/migration/master.yaml
-    enabled: false
+#    enabled: false
+
+jwt:
+  secret: SECRET
+  issuer: localhost
+  days_until_expiration: 1
