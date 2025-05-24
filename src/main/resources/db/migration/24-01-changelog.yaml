@@ -1,0 +1,141 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1748105046882-1
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_card
+                  name: uuid
+                  type: UUID
+              - column:
+                  name: encrypted_card_number
+                  type: VARCHAR(255)
+              - column:
+                  name: owner_id
+                  type: UUID
+              - column:
+                  name: expires_at
+                  type: DATE
+              - column:
+                  name: status_id
+                  type: INT
+              - column:
+                  name: balance
+                  type: DECIMAL
+            tableName: card
+  - changeSet:
+      id: 1748105046882-2
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_role
+                  name: id
+                  type: INT
+              - column:
+                  name: role
+                  type: VARCHAR(255)
+            tableName: role
+  - changeSet:
+      id: 1748105046882-3
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_status
+                  name: id
+                  type: INT
+              - column:
+                  name: status
+                  type: VARCHAR(255)
+            tableName: status
+  - changeSet:
+      id: 1748105046882-4
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user
+                  name: id
+                  type: UUID
+              - column:
+                  name: role_id
+                  type: INT
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+            tableName: user
+  - changeSet:
+      id: 1748105046882-5
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: owner_id
+            baseTableName: card
+            constraintName: FK_CARD_ON_OWNER
+            referencedColumnNames: id
+            referencedTableName: user
+  - changeSet:
+      id: 1748105046882-6
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: status_id
+            baseTableName: card
+            constraintName: FK_CARD_ON_STATUS
+            referencedColumnNames: id
+            referencedTableName: status
+  - changeSet:
+      id: 1748105046882-7
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: role_id
+            baseTableName: user
+            constraintName: FK_USER_ON_ROLE
+            referencedColumnNames: id
+            referencedTableName: role
+
+  - changeSet:
+      id: 1748105046882-8
+      author: genius
+      comment: "Это для вставки ролей"
+      changes:
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: role
+                  value: "ROLE_ADMIN"
+        - insert:
+            tableName: role
+            columns:
+              - column:
+                  name: role
+                  value: "ROLE_USER"

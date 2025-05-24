@@ -22,18 +22,21 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID uuid;
 
+    @Column(nullable = false, unique = true)
     private String encryptedCardNumber;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 
+    @Column(nullable = false)
     private LocalDate expiresAt;
 
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Status status;
 
+    @Column(nullable = false)
     private BigDecimal balance;
 
     @Transient

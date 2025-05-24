@@ -23,5 +23,6 @@ public class User {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
+    @Column(nullable = false)
     private String name;
 }
