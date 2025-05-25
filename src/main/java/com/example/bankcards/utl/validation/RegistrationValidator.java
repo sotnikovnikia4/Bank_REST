@@ -1,4 +1,4 @@
-package com.example.bankcards.utl;
+package com.example.bankcards.utl.validation;
 
 import com.example.bankcards.dto.CreationUserDTO;
 import com.example.bankcards.entity.User;

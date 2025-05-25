@@ -3,7 +3,7 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.CardDTO;
 import com.example.bankcards.dto.CreationCardDTO;
 import com.example.bankcards.service.CardService;
-import com.example.bankcards.utl.CreationCardValidator;
+import com.example.bankcards.utl.validation.CreationCardValidator;
 import com.example.bankcards.utl.ErrorMessageCreator;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
