@@ -1,12 +1,4 @@
 databaseChangeLog:
 
   - include:
-      file: db/migration/24-01-changelog.yaml
-  - include:
-      file: db/migration/24-02-changelog.yaml
-  - include:
-      file: db/migration/24-03-changelog.yaml
-  - include:
-      file: db/migration/24-04-changelog.yaml
-  - include:
-      file: db/migration/24-05-changelog.yaml
+      file: db/migration/25-01-changelog.yaml

@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1748107242866-1
+      id: 1748170704425-1
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -11,7 +11,7 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: pk_card
-                  name: uuid
+                  name: id
                   type: UUID
               - column:
                   constraints:
@@ -19,6 +19,8 @@ databaseChangeLog:
                   name: encrypted_card_number
                   type: VARCHAR(255)
               - column:
+                  constraints:
+                    nullable: false
                   name: owner_id
                   type: UUID
               - column:
@@ -27,6 +29,8 @@ databaseChangeLog:
                   name: expires_at
                   type: DATE
               - column:
+                  constraints:
+                    nullable: false
                   name: status_id
                   type: INT
               - column:
@@ -36,7 +40,7 @@ databaseChangeLog:
                   type: DECIMAL
             tableName: card
   - changeSet:
-      id: 1748107242866-2
+      id: 1748170704425-2
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -57,7 +61,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
             tableName: role
   - changeSet:
-      id: 1748107242866-3
+      id: 1748170704425-3
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -78,7 +82,7 @@ databaseChangeLog:
                   type: VARCHAR(255)
             tableName: status
   - changeSet:
-      id: 1748107242866-4
+      id: 1748170704425-4
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -88,20 +92,32 @@ databaseChangeLog:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: pk_user
+                    primaryKeyName: pk_user_table
                   name: id
                   type: UUID
               - column:
+                  constraints:
+                    nullable: false
                   name: role_id
                   type: INT
               - column:
                   constraints:
                     nullable: false
+                  name: login
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
                   name: name
                   type: VARCHAR(255)
-            tableName: user
+            tableName: user_table
   - changeSet:
-      id: 1748107242866-5
+      id: 1748170704425-5
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -110,7 +126,7 @@ databaseChangeLog:
             constraintName: uc_card_encryptedcardnumber
             tableName: card
   - changeSet:
-      id: 1748107242866-6
+      id: 1748170704425-6
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -119,7 +135,7 @@ databaseChangeLog:
             constraintName: uc_role_role
             tableName: role
   - changeSet:
-      id: 1748107242866-7
+      id: 1748170704425-7
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -128,7 +144,16 @@ databaseChangeLog:
             constraintName: uc_status_status
             tableName: status
   - changeSet:
-      id: 1748107242866-8
+      id: 1748170704425-8
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: login
+            constraintName: uc_user_table_login
+            tableName: user_table
+  - changeSet:
+      id: 1748170704425-9
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -137,9 +162,9 @@ databaseChangeLog:
             baseTableName: card
             constraintName: FK_CARD_ON_OWNER
             referencedColumnNames: id
-            referencedTableName: user
+            referencedTableName: user_table
   - changeSet:
-      id: 1748107242866-9
+      id: 1748170704425-10
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
@@ -150,19 +175,19 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: status
   - changeSet:
-      id: 1748107242866-10
+      id: 1748170704425-11
       author: genius
       objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
       changes:
         - addForeignKeyConstraint:
             baseColumnNames: role_id
-            baseTableName: user
-            constraintName: FK_USER_ON_ROLE
+            baseTableName: user_table
+            constraintName: FK_USER_TABLE_ON_ROLE
             referencedColumnNames: id
             referencedTableName: role
 
   - changeSet:
-      id: 1748105046882-8
+      id: 1748170704425-12
       author: genius
       comment: "Это для вставки ролей"
       changes:
@@ -179,7 +204,7 @@ databaseChangeLog:
                   name: role
                   value: "ROLE_USER"
   - changeSet:
-      id: 1748105046882-9
+      id: 1748170704425-13
       author: genius
       comment: "Это для вставки статусов"
       changes:
@@ -201,3 +226,26 @@ databaseChangeLog:
               - column:
                   name: status
                   value: "EXPIRED"
+  - changeSet:
+      id: 1748170704425-14
+      author: genius
+      comment: "Это для вставки первого админа"
+      changes:
+        - insert:
+            tableName: user_table
+            columns:
+              - column:
+                  name: "id"
+                  value: "120de713-56ed-4f55-8a76-72066e422088"
+              - column:
+                  name: "role_id"
+                  value: 1
+              - column:
+                  name: "name"
+                  value: "admin"
+              - column:
+                  name: "login"
+                  value: "admin"
+              - column:
+                  name: "password"
+                  value: "$2a$12$nqCU.IH.iO.f7daP9PCNHuK8359gLeyli0voHHIBlicBTgKYULuOS" #very hard password

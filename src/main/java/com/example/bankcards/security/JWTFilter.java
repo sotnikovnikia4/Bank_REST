@@ -57,7 +57,7 @@ public class JWTFilter extends OncePerRequestFilter {
         } catch (JWTVerificationException | UsernameNotFoundException e) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(objectMapper.writeValueAsString(new ExceptionMessage("Jwt token is incorrect!", new Date())));
+            response.getWriter().write(objectMapper.writeValueAsString(ExceptionMessage.builder().message("Jwt token is incorrect!").timestamp(new Date()).status(HttpStatus.UNAUTHORIZED.value()).build()));
         }
     }
 

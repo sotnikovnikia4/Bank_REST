@@ -1,6 +1,8 @@
 package com.example.bankcards.config;
 
+import com.example.bankcards.exception.ExceptionController;
 import com.example.bankcards.security.JWTFilter;
+import com.example.bankcards.service.AuthorizationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SecurityConfig{
 
     private final JWTFilter jwtFilter;
+    private final ExceptionController exceptionController;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -32,14 +35,22 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(
-                                        "/error"
+                                        "/error",
+                                        "/api/auth/login"
                                 )
                                 .permitAll()
+                                .requestMatchers(
+                                        "/api/auth/registration"
+                                ).hasRole(AuthorizationService.ADMIN_ROLE)
                                 .anyRequest().permitAll()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(m ->
                         m.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> {
+                    exception.accessDeniedHandler(exceptionController::accessDenied);
+                    exception.authenticationEntryPoint(exceptionController::entryPoint);
+                })
                 .build();
     }
 

@@ -3,12 +3,13 @@ package com.example.bankcards.service.implementation;
 import com.example.bankcards.dto.AuthenticationDTO;
 import com.example.bankcards.dto.CreationUserDTO;
 import com.example.bankcards.dto.TokenDTO;
+import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
-import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.security.JWTUtil;
 import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.AuthorizationService;
-import jakarta.validation.Valid;
+import com.example.bankcards.service.RoleService;
+import com.example.bankcards.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,23 +26,27 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final UserDetailsHolder userDetailsHolder;
     private final JWTUtil jwtUtil;
 
-    private final UserRepository userRepository;
+    private final RoleService roleService;
+    private final UserService userService;
 
     public TokenDTO register(CreationUserDTO userDTO) {
+        userService.checkIfLoginFreeOtherwiseThrowValidationException(userDTO.getLogin());
+        Role role = roleService.getRoleOrThrowValidationException(userDTO.getRole());
+
         User user = User.builder()
                 .name(userDTO.getName())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
                 .login(userDTO.getLogin())
-                .role(userDTO.getRole())
+                .role(role)
                 .build();
 
-        user = userRepository.save(user);
+        user = userService.saveUser(user);
 
         return getTokenDTO(user);
     }
 
     public TokenDTO authenticate(AuthenticationDTO authenticationDTO) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationDTO.getUsername(), authenticationDTO.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationDTO.getLogin(), authenticationDTO.getPassword()));
 
         User user = userDetailsHolder.getUserFromPrincipal(authentication.getPrincipal());
 

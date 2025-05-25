@@ -5,7 +5,6 @@ import com.example.bankcards.dto.CreationUserDTO;
 import com.example.bankcards.dto.TokenDTO;
 import com.example.bankcards.service.AuthorizationService;
 import com.example.bankcards.utl.ErrorMessageCreator;
-import com.example.bankcards.utl.validation.RegistrationValidator;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +20,10 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final ErrorMessageCreator errorMessageCreator;
     private final AuthorizationService authorizationService;
-    private final RegistrationValidator registrationValidator;
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
     public TokenDTO register(@RequestBody @Valid CreationUserDTO creationUserDTO, BindingResult bindingResult){
-        registrationValidator.validate(creationUserDTO, bindingResult);
         if(bindingResult.hasErrors()){
             throw new ValidationException(errorMessageCreator.createErrorMessage(bindingResult));
         }
@@ -42,7 +39,6 @@ public class AuthController {
         }
 
         TokenDTO tokenDTO = authorizationService.authenticate(authenticationDTO);
-
         return ResponseEntity.ok(tokenDTO);
     }
 }

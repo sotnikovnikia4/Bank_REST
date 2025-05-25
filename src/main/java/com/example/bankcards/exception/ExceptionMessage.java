@@ -1,17 +1,15 @@
 package com.example.bankcards.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Builder
+@Data
 public class ExceptionMessage {
+    private int status;
     private String message;
     private Date timestamp;
 }

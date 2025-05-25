@@ -4,6 +4,8 @@ import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.service.UserService;
+import com.example.bankcards.utl.ErrorMessageCreator;
+import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final ErrorMessageCreator errorMessageCreator;
 
     private UserDTO convertToUserDTO(User user) {
         return UserDTO.builder()
@@ -32,5 +35,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserById(UUID id) {
         return userRepository.findById(id);
+    }
+
+    @Override
+    public void checkIfLoginFreeOtherwiseThrowValidationException(String login) throws ValidationException{
+        Optional<User> userWithSameLogin = getUserByLogin(login);
+
+        if(userWithSameLogin.isPresent()) {
+            throw new ValidationException(errorMessageCreator.createErrorMessage("login", "Login already exists"));
+        }
+    }
+
+    public User saveUser(User user){
+        return userRepository.save(user);
     }
 }
