@@ -3,6 +3,7 @@ package com.example.bankcards.controller;
 import com.example.bankcards.dto.AuthenticationDTO;
 import com.example.bankcards.dto.CreationUserDTO;
 import com.example.bankcards.dto.TokenDTO;
+import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.service.AuthorizationService;
 import com.example.bankcards.utl.ErrorMessageCreator;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ public class AuthController {
 
     @PostMapping("/registration")
     @ResponseStatus(HttpStatus.CREATED)
-    public TokenDTO register(@RequestBody @Valid CreationUserDTO creationUserDTO, BindingResult bindingResult){
+    public UserDTO register(@RequestBody @Valid CreationUserDTO creationUserDTO, BindingResult bindingResult){
         if(bindingResult.hasErrors()){
             throw new ValidationException(errorMessageCreator.createErrorMessage(bindingResult));
         }

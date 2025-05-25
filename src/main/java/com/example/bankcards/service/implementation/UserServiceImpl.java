@@ -3,6 +3,7 @@ package com.example.bankcards.service.implementation;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.service.RoleService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.utl.ErrorMessageCreator;
 import jakarta.validation.ValidationException;
@@ -18,12 +19,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ErrorMessageCreator errorMessageCreator;
 
-    private UserDTO convertToUserDTO(User user) {
+    public UserDTO convertToUserDTO(User user) {
         return UserDTO.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .login(user.getLogin())
-                .role(user.getRole())
+                .role(user.getRole().getRole().substring(RoleService.PREFIX_ROLE.length()))
                 .build();
     }
 

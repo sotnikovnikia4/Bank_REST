@@ -3,6 +3,7 @@ package com.example.bankcards.service.implementation;
 import com.example.bankcards.dto.AuthenticationDTO;
 import com.example.bankcards.dto.CreationUserDTO;
 import com.example.bankcards.dto.TokenDTO;
+import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.security.JWTUtil;
@@ -29,7 +30,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
     private final RoleService roleService;
     private final UserService userService;
 
-    public TokenDTO register(CreationUserDTO userDTO) {
+    public UserDTO register(CreationUserDTO userDTO) {
         userService.checkIfLoginFreeOtherwiseThrowValidationException(userDTO.getLogin());
         Role role = roleService.getRoleOrThrowValidationException(userDTO.getRole());
 
@@ -42,7 +43,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
 
         user = userService.saveUser(user);
 
-        return getTokenDTO(user);
+        return userService.convertToUserDTO(user);
     }
 
     public TokenDTO authenticate(AuthenticationDTO authenticationDTO) {

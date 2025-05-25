@@ -10,18 +10,15 @@ import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value = "/api/cards", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class CardController {
-    //удаление карты
-    //изменение карты
-    //получение данных карты
     //пагинация и фильтрация карт
     //перевод между двумя картами одного пользователя
     private final ErrorMessageCreator errorMessageCreator;
@@ -38,4 +35,26 @@ public class CardController {
 
         return cardService.createCard(creationCardDTO);
     }
+
+//    @GetMapping("/{id}")
+//    public CardDTO get(@PathVariable UUID id) {
+//
+//    }
+//
+//    @GetMapping
+//    public List<CardDTO> getAll(){
+//
+//    }
+//
+//    @PatchMapping("/{id}/activate")
+//    public CardDTO activate(@PathVariable UUID id) {
+//
+//    }
+//
+//    @PatchMapping("/{id}/block")
+//    public CardDTO block(@PathVariable UUID id) {
+//
+//    }
+
+
 }

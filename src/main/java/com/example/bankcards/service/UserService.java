@@ -1,5 +1,6 @@
 package com.example.bankcards.service;
 
+import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.User;
 import jakarta.validation.ValidationException;
 
@@ -14,4 +15,7 @@ public interface UserService {
     void checkIfLoginFreeOtherwiseThrowValidationException(String login) throws ValidationException;
 
     User saveUser(User user);
+
+
+    UserDTO convertToUserDTO(User user);
 }

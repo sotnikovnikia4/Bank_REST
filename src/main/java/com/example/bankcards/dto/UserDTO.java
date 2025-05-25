@@ -16,7 +16,7 @@ import java.util.UUID;
 public class UserDTO {
     private UUID id;
 
-    private Role role;
+    private String role;
 
     private String login;
 

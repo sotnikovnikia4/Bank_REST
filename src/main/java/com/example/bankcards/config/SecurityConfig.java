@@ -40,7 +40,11 @@ public class SecurityConfig{
                                 )
                                 .permitAll()
                                 .requestMatchers(
-                                        "/api/auth/registration"
+                                        "/api/auth/registration",
+                                        "/api/cards/create",
+                                        "/api/cards/update",
+                                        "/api/cards/get-all",
+                                        "/api/cards/delete"
                                 ).hasRole(AuthorizationService.ADMIN_ROLE)
                                 .anyRequest().permitAll()
                 )
