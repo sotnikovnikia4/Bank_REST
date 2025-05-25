@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.crypto.SecretKey;
+import java.util.Random;
 
 @Configuration
 public class EncryptionConfig {
@@ -13,5 +14,10 @@ public class EncryptionConfig {
     @Bean
     public SecretKey secretKey(EncryptionHelper encryptionHelper, @Value("${encryption.password}") String password, @Value("${encryption.salt}") String salt) {
         return encryptionHelper.generateKey(password.toCharArray(), salt.getBytes());
+    }
+
+    @Bean
+    public Random random(){
+        return new Random();
     }
 }

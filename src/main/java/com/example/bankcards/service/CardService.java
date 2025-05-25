@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -32,10 +33,14 @@ public class CardService {
                 .expiresAt(creationCardDTO.getExpiresAt())
                 .balance(new BigDecimal(0))
                 .status(Status.builder().status(ACTIVE).build())
-                .cardNumber(cardNumberGenerator.generateCardNumber())
                 .build();
 
-        card.setEncryptedCardNumber(encryptionHelper.encryptCardNumber(secretKey, card.getCardNumber()));
+        Optional<Card> cardWithSameNumber;
+        do{
+            card.setCardNumber(cardNumberGenerator.generateCardNumber());
+            card.setEncryptedCardNumber(encryptionHelper.encryptCardNumber(secretKey, card.getCardNumber()));
+            cardWithSameNumber = cardRepository.findByEncryptedCardNumber(card.getEncryptedCardNumber());
+        }while(cardWithSameNumber.isPresent());
 
         card = cardRepository.save(card);
         return convertToCardDTO(card);

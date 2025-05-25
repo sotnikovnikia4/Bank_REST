@@ -10,17 +10,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CardNumber {
+    public static final int CARD_SIZE = 16;
+
     private byte[] number;
 
     public String getMask(){
-        StringBuffer sb = new StringBuffer(16);
 
-        sb.append("**** **** **** ");
-        sb.append(number[12]);
-        sb.append(number[13]);
-        sb.append(number[14]);
-        sb.append(number[15]);
-
-        return sb.toString();
+        return "**** **** **** " +
+                number[12] +
+                number[13] +
+                number[14] +
+                number[15];
     }
 }
