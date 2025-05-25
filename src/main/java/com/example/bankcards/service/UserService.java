@@ -1,5 +1,6 @@
 package com.example.bankcards.service;
 
+import com.example.bankcards.dto.UpdatingUserDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.User;
 import jakarta.validation.ValidationException;
@@ -10,7 +11,7 @@ import java.util.UUID;
 public interface UserService {
     Optional<User> getUserByLogin(String login);
 
-    Optional<User> getUserById(UUID id);
+    Optional<User> getOptionalUserById(UUID id);
 
     void checkIfLoginFreeOtherwiseThrowValidationException(String login) throws ValidationException;
 
@@ -18,4 +19,10 @@ public interface UserService {
 
 
     UserDTO convertToUserDTO(User user);
+
+    UserDTO getUser(UUID id);
+
+    void deleteUser(UUID id);
+
+    UserDTO updateUser(UUID id, UpdatingUserDTO userDTO);
 }

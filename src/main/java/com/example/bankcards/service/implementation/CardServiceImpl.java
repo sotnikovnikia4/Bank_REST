@@ -37,10 +37,11 @@ public class CardServiceImpl implements CardService {
     private final UserDetailsHolder userDetailsHolder;
 
     private final ErrorMessageCreator errorMessageCreator;
-    private final View error;
 
     @Override
     public CardDTO createCard(CreationCardDTO creationCardDTO) {
+
+
         Card card = Card.builder()
                 .owner(User.builder().id(creationCardDTO.getOwnerId()).build())
                 .expiresAt(creationCardDTO.getExpiresAt())

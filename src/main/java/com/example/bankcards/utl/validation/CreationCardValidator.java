@@ -25,7 +25,7 @@ public class CreationCardValidator  implements Validator {
     public void validate(Object target, Errors errors) {
         CreationCardDTO creationCardDTO = (CreationCardDTO) target;
 
-        Optional<User> foundUser = userService.getUserById(creationCardDTO.getOwnerId());
+        Optional<User> foundUser = userService.getOptionalUserById(creationCardDTO.getOwnerId());
         if (foundUser.isEmpty()) {
             errors.rejectValue("ownerId", "", "Such user does not exist");
         }

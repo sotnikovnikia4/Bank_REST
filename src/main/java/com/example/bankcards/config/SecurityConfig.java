@@ -40,13 +40,20 @@ public class SecurityConfig{
                                 )
                                 .permitAll()
                                 .requestMatchers(
+                                        "/api/users/me/**"
+                                )
+                                .hasRole(RoleService.USER_ROLE)
+                                .requestMatchers(
                                         "/api/auth/registration",
                                         "/api/auth/",
                                         "/api/cards",
                                         "/api/cards/*/activate",
-                                        "/api/cards/*/block"
+                                        "/api/cards/*/block",
+                                        "/api/users/**"
                                 ).hasRole(RoleService.ADMIN_ROLE)
-                                .requestMatchers("/api/cards/*")
+                                .requestMatchers(
+                                        "/api/cards/*"
+                                )
                                 .authenticated()
                                 .anyRequest().permitAll()
                 )
