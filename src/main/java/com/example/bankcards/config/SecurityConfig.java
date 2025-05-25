@@ -2,7 +2,7 @@ package com.example.bankcards.config;
 
 import com.example.bankcards.exception.ExceptionController;
 import com.example.bankcards.security.JWTFilter;
-import com.example.bankcards.service.AuthorizationService;
+import com.example.bankcards.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,11 +41,13 @@ public class SecurityConfig{
                                 .permitAll()
                                 .requestMatchers(
                                         "/api/auth/registration",
-                                        "/api/cards/create",
-                                        "/api/cards/update",
-                                        "/api/cards/get-all",
-                                        "/api/cards/delete"
-                                ).hasRole(AuthorizationService.ADMIN_ROLE)
+                                        "/api/auth/",
+                                        "/api/cards",
+                                        "/api/cards/*/activate",
+                                        "/api/cards/*/block"
+                                ).hasRole(RoleService.ADMIN_ROLE)
+                                .requestMatchers("/api/cards/*")
+                                .authenticated()
                                 .anyRequest().permitAll()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

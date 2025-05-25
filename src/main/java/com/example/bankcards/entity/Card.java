@@ -36,7 +36,7 @@ public class Card {
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     private Status status;
 
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 14, scale = 2)
     private BigDecimal balance;
 
     @Transient

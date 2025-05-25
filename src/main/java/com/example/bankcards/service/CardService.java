@@ -2,23 +2,21 @@ package com.example.bankcards.service;
 
 import com.example.bankcards.dto.CardDTO;
 import com.example.bankcards.dto.CreationCardDTO;
-import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.Status;
-import com.example.bankcards.entity.User;
-import com.example.bankcards.repository.CardRepository;
-import com.example.bankcards.utl.CardNumberGenerator;
-import com.example.bankcards.utl.EncryptionHelper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.example.bankcards.dto.TransferDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 
-import javax.crypto.SecretKey;
-import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.List;
+import java.util.UUID;
 
 public interface CardService {
-    String ACTIVE = "ACTIVE";
-    String BLOCKED = "BLOCKED";
-    String EXPIRED = "EXPIRED";
-
     CardDTO createCard(CreationCardDTO creationCardDTO);
+
+    CardDTO getCard(UUID id) throws ValidationException;
+
+    CardDTO setStatus(UUID id, String active);
+
+    List<CardDTO> transfer(TransferDTO transferDTO);
+
+    void deleteCard(UUID id);
 }
