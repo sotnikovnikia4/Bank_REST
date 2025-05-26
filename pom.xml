@@ -120,26 +120,6 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.springdoc</groupId>
-				<artifactId>springdoc-openapi-maven-plugin</artifactId>
-				<version>1.4</version> <executions>
-				<execution>
-					<id>generate-openapi-docs</id>
-					<phase>integration-test</phase> <goals>
-					<goal>generate</goal>
-				</goals>
-				</execution>
-			</executions>
-				<configuration>
-					<apiDocsUrl>http://localhost:8080/api/docs</apiDocsUrl>
-					<outputFileName>openapi.yaml</outputFileName>
-					<outputDir>${project.basedir}/src/main/resources/static</outputDir> </configuration>
-			</plugin>
 		</plugins>
 	</build>
 
