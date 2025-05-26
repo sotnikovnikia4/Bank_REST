@@ -38,8 +38,8 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getUsers(){
-        return null;//TODO пагниация нужна
+    public List<UserDTO> getUsers(@RequestParam int pageNumber, @RequestParam int pageSize, @RequestParam(required = false) String name, @RequestParam(required = false) String role){
+        return userService.getUsers()
     }
 
     @GetMapping("/{id}")
@@ -82,7 +82,7 @@ public class UserController {
     }
 
     @GetMapping("/block-requests")
-    public List<BlockRequestDTO> getAllBlockRequests(){
-        return null;//TODO пагинация
+    public List<BlockRequestDTO> getAllBlockRequests(@RequestParam int pageNumber, @RequestParam int pageSize){
+        return blockRequestService.getAll(pageNumber, pageSize);
     }
 }

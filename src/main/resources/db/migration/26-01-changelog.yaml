@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1748258668976-1
+      author: sotni (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_blockrequests
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: card_id
+                  type: UUID
+            tableName: block_requests
+  - changeSet:
+      id: 1748258668976-2
+      author: sotni (generated)
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: card_id
+            baseTableName: block_requests
+            constraintName: FK_BLOCKREQUESTS_ON_CARD
+            referencedColumnNames: id
+            referencedTableName: card
+

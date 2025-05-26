@@ -1,5 +1,6 @@
 package com.example.bankcards.service.implementation;
 
+import com.example.bankcards.dto.BlockRequestDTO;
 import com.example.bankcards.entity.BlockRequest;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.User;
@@ -10,8 +11,10 @@ import com.example.bankcards.service.CardService;
 import com.example.bankcards.util.ErrorMessageCreator;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,5 +51,16 @@ public class BlockRequestServiceImpl implements BlockRequestService {
         }
 
         blockRequestRepository.delete(blockRequest.get());
+    }
+
+    @Override
+    public List<BlockRequestDTO> getAll(int pageNumber, int pageSize) {
+        List<BlockRequest> blockRequests = blockRequestRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
+
+        return blockRequests.stream().map(this::convertToBlockRequestDTO).toList();
+    }
+
+    private BlockRequestDTO convertToBlockRequestDTO(BlockRequest blockRequest){
+        return BlockRequestDTO.builder().id(blockRequest.getId()).cardId(blockRequest.getCard().getId()).build();
     }
 }

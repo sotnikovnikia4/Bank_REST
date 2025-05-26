@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> getUserByLogin(String login) {
-        return userRepository.findByLogin(login);
+        return userRepository.findByLoginIgnoreCase(login);
     }
 
     @Override
