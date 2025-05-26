@@ -71,7 +71,8 @@ public class CardServiceImpl implements CardService {
         throw new ValidationException(errorMessageCreator.createErrorMessage("id", "Card does not belong user or user is not admin"));
     }
 
-    private Card getCardOrThrowValidationException(UUID id) throws ValidationException{
+    @Override
+    public Card getCardOrThrowValidationException(UUID id) throws ValidationException {
         Optional<Card> card = cardRepository.findById(id);
         if(card.isEmpty()){
             throw new ValidationException(errorMessageCreator.createErrorMessage("id", "Card with id not found"));
@@ -124,6 +125,13 @@ public class CardServiceImpl implements CardService {
         Card card = getCardOrThrowValidationException(id);
 
         cardRepository.delete(card);
+    }
+
+    @Override
+    public void checkOwnerOrThrowException(Card card, UUID userId){
+        if(card.getOwner().getId().compareTo(userId) != 0){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("card", "Card does not belong user"));
+        }
     }
 
     private CardDTO convertToCardDTO(Card card) {

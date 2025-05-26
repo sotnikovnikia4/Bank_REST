@@ -14,6 +14,5 @@ import java.util.UUID;
 public class BlockRequestDTO {
     private UUID id;
 
-    private UUID ownerId;
     private UUID cardId;
 }

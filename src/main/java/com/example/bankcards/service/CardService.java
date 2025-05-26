@@ -3,6 +3,7 @@ package com.example.bankcards.service;
 import com.example.bankcards.dto.CardDTO;
 import com.example.bankcards.dto.CreationCardDTO;
 import com.example.bankcards.dto.TransferDTO;
+import com.example.bankcards.entity.Card;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 
@@ -19,4 +20,8 @@ public interface CardService {
     List<CardDTO> transfer(TransferDTO transferDTO);
 
     void deleteCard(UUID id);
+
+    Card getCardOrThrowValidationException(UUID id) throws ValidationException;
+
+    void checkOwnerOrThrowException(Card card, UUID userId);
 }
