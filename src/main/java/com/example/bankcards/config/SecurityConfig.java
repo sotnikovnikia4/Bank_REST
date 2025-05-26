@@ -4,6 +4,7 @@ import com.example.bankcards.exception.ExceptionController;
 import com.example.bankcards.security.JWTFilter;
 import com.example.bankcards.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -25,6 +26,9 @@ public class SecurityConfig{
 
     private final JWTFilter jwtFilter;
     private final ExceptionController exceptionController;
+
+    @Value("#{'${cors.allowedOrigins}'.split(',')}")
+    private String[] allowedOrigins;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
@@ -73,7 +77,7 @@ public class SecurityConfig{
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("*").allowedMethods("*");
+                registry.addMapping("/**").allowedOrigins(allowedOrigins).allowedMethods("*").allowCredentials(true);
             }
         };
     }

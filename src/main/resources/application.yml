@@ -30,3 +30,6 @@ springdoc:
   swagger-ui:
     path: /api/docs/swagger
     operations-sorter: alpha
+
+cors:
+  allowedOrigins: http://localhost:3000,http://localhost:8080
