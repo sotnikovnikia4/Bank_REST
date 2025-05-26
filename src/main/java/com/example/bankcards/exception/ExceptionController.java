@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Date;
 
@@ -58,12 +59,18 @@ public class ExceptionController {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionMessage> handleException(HttpMessageNotReadableException e){
-        ExceptionMessage message = ExceptionMessage.builder().message("Something wrong with request's body").status(HttpStatus.BAD_REQUEST.value()).timestamp(new Date()).build();
+        ExceptionMessage message = ExceptionMessage.builder().message("Not readable request's body").status(HttpStatus.BAD_REQUEST.value()).timestamp(new Date()).build();
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ExceptionMessage> handleException(MissingServletRequestParameterException e){
+        ExceptionMessage message = ExceptionMessage.builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST.value()).timestamp(new Date()).build();
+        return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ExceptionMessage> handleException(MethodArgumentTypeMismatchException e){
         ExceptionMessage message = ExceptionMessage.builder().message(e.getMessage()).status(HttpStatus.BAD_REQUEST.value()).timestamp(new Date()).build();
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
     }

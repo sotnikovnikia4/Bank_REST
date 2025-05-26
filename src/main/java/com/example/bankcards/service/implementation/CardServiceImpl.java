@@ -4,7 +4,10 @@ import com.example.bankcards.dto.*;
 import com.example.bankcards.entity.*;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.UserDetailsHolder;
-import com.example.bankcards.service.*;
+import com.example.bankcards.service.CardService;
+import com.example.bankcards.service.RoleService;
+import com.example.bankcards.service.StatusService;
+import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.CardNumberGenerator;
 import com.example.bankcards.util.EncryptionHelper;
 import com.example.bankcards.util.ErrorMessageCreator;
@@ -16,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;
@@ -100,10 +104,13 @@ public class CardServiceImpl implements CardService {
             throw new ValidationException(errorMessageCreator.createErrorMessage("status", "Card has expired"));
         }
         else if(status.getStatus().equals(StatusService.EXPIRED)){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("status", "Status 'EXPIRED' can be set according expiration date by system"));
+            throw new ValidationException(errorMessageCreator.createErrorMessage("status", "Status 'EXPIRED' can be set according expiration date and only by system"));
         }
 
-        throw new ValidationException(errorMessageCreator.createErrorMessage("status", "Invalid status"));
+        card.setStatus(status);
+        card = cardRepository.save(card);
+
+        return convertToCardDTO(card);
     }
 
     @Override
