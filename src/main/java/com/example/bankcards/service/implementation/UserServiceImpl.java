@@ -3,6 +3,7 @@ package com.example.bankcards.service.implementation;
 import com.example.bankcards.dto.PageDTO;
 import com.example.bankcards.dto.UpdatingUserDTO;
 import com.example.bankcards.dto.UserDTO;
+import com.example.bankcards.dto.UserFilterDTO;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.entity.Role_;
 import com.example.bankcards.entity.User;
@@ -66,17 +67,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, String name, String role, String login) {
+    public PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO) {
         if(pageSize <= 0){
             throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
         }
 
-        if(role != null && !role.isBlank()){
-            role =  RoleService.PREFIX_ROLE + role;
-        }
-
         Page<User> pageable = userRepository.findAll(
-                findUsersSpecification(name, role, login),
+                findUsersSpecification(userFilterDTO),
                 PageRequest.of(pageNumber, pageSize)
         );
 
@@ -85,18 +82,22 @@ public class UserServiceImpl implements UserService {
         ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).build();
     }
 
-    private Specification<User> findUsersSpecification(String name, String roleName, String login) {
+    private Specification<User> findUsersSpecification(UserFilterDTO userFilterDTO) {
+        if(userFilterDTO.getRole() != null && !userFilterDTO.getRole().isBlank()){
+            userFilterDTO.setRole(RoleService.PREFIX_ROLE + userFilterDTO.getRole());
+        }
+
         return (root, query, builder) -> {
             List<Predicate> predicates = new ArrayList<>();
-            if(name != null && !name.isBlank()){
-                predicates.add(builder.like(root.get(User_.name), "%" + name + "%"));
+            if(userFilterDTO.getName() != null && !userFilterDTO.getName().isBlank()){
+                predicates.add(builder.like(root.get(User_.name), "%" + userFilterDTO.getName() + "%"));
             }
-            if(login != null && !login.isBlank()){
-                predicates.add(builder.like(root.get(User_.login), "%" + login + "%"));
+            if(userFilterDTO.getLogin() != null && !userFilterDTO.getLogin().isBlank()){
+                predicates.add(builder.like(root.get(User_.login), "%" + userFilterDTO.getLogin() + "%"));
             }
-            if(roleName != null && !roleName.isBlank()){
+            if(userFilterDTO.getRole() != null && !userFilterDTO.getRole().isBlank()){
                 Join<User, Role> roleJoin = root.join(User_.role);
-                predicates.add(builder.equal(roleJoin.get(Role_.role), roleName));
+                predicates.add(builder.equal(roleJoin.get(Role_.role), userFilterDTO.getRole()));
             }
 
             return builder.and(predicates.toArray(Predicate[]::new));

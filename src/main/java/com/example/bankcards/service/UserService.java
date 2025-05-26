@@ -3,6 +3,7 @@ package com.example.bankcards.service;
 import com.example.bankcards.dto.PageDTO;
 import com.example.bankcards.dto.UpdatingUserDTO;
 import com.example.bankcards.dto.UserDTO;
+import com.example.bankcards.dto.UserFilterDTO;
 import com.example.bankcards.entity.User;
 import jakarta.validation.ValidationException;
 
@@ -26,7 +27,7 @@ public interface UserService {
 
     UserDTO updateUser(UUID id, UpdatingUserDTO userDTO);
 
-    PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, String name, String role, String login);
+    PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO);
 
     User getUserOrThrowValidationException(UUID id, String fieldName) throws ValidationException;
 }

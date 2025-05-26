@@ -41,11 +41,9 @@ public class UserController {
     public PageDTO<UserDTO> getUsers(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String role, 
-            @RequestParam(required = false) String login
+            @ModelAttribute UserFilterDTO filter
     ){
-        return userService.getUsers(pageNumber, pageSize, name, role, login);
+        return userService.getUsers(pageNumber, pageSize, filter);
     }
 
     @GetMapping("/{id}")

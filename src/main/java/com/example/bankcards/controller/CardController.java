@@ -47,15 +47,16 @@ public class CardController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<CardDTO> getAll(
-//            @RequestParam int pageNumber,
-//            @RequestParam int pageSize,
-//            @RequestParam(required = false) String ownerName,
-//            @RequestParam(required = false) String status,
-//            @RequestParam(required = false) LocalDate expireBefore,
-//            @RequestParam(required = false) LocalDate expireAfter,
-//            @RequestParam(required = false) LocalDate balance,
-//            @RequestParam(required = false) LocalDate expireAfter
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String ownerName,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) LocalDate expireBefore,
+            @RequestParam(required = false) LocalDate expireAfter,
+            @RequestParam(required = false) LocalDate balanceMin,
+            @RequestParam(required = false) LocalDate balanceMax
             ){
+//        return cardService.getCardsLikeAdmin(pageNumber, pageSize, ownerName, status, expireBefore, expireAfter, balanceMin, balanceMax);
         return null;
     }
 
