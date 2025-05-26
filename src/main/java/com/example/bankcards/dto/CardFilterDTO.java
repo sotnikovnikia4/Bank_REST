@@ -20,8 +20,6 @@ public class CardFilterDTO {
     private LocalDate expireBefore;
     private LocalDate expireAfter;
 
-    @DecimalMin(value = "0,01", message = "balanceMin should be greater than 0")
     private BigDecimal balanceMin;
-    @DecimalMin(value = "0,01", message = "balanceMax should be greater than 0")
     private BigDecimal balanceMax;
 }

@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
 
         return PageDTO.<UserDTO>builder().data(
                 pageable.getContent().stream().map(this::convertToUserDTO).toList()
-        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).build();
+        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).totalElements(pageable.getTotalElements()).build();
     }
 
     private Specification<User> findUsersSpecification(UserFilterDTO userFilterDTO) {

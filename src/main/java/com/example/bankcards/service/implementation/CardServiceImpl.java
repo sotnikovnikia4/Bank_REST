@@ -157,7 +157,7 @@ public class CardServiceImpl implements CardService {
 
         return PageDTO.<CardDTO>builder().data(
                 pageable.getContent().stream().map(this::convertToCardDTO).toList()
-        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).build();
+        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).totalElements(pageable.getTotalElements()).build();
     }
 
     private Specification<Card> findCardsSpecification(CardFilterDTO cardFilterDTO){
@@ -190,6 +190,10 @@ public class CardServiceImpl implements CardService {
     }
 
     private CardDTO convertToCardDTO(Card card) {
+        if(card.getCardNumber() == null){
+            card.setCardNumber(encryptionHelper.decryptCardNumber(secretKey, card.getEncryptedCardNumber()));
+        }
+
         return CardDTO.builder()
                 .id(card.getId())
                 .balance(card.getBalance())
