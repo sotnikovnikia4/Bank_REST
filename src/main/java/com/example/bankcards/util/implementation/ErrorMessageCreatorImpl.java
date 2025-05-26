@@ -6,17 +6,6 @@ import org.springframework.validation.BindingResult;
 
 @Component
 public class ErrorMessageCreatorImpl implements ErrorMessageCreator {
-//    @Override
-//    public MultiValueMap<String, String> createErrorMessageMap(BindingResult bindingResult) {
-//        MultiValueMap<String, String> errorMessageMap = new LinkedMultiValueMap<>();
-//
-//        for(var error : bindingResult.getFieldErrors()) {
-//            errorMessageMap.add(error.getField(), error.getDefaultMessage());
-//        }
-//
-//        return errorMessageMap;
-//    }
-
     @Override
     public String createErrorMessage(BindingResult bindingResult) {
         StringBuilder errorMessage = new StringBuilder();

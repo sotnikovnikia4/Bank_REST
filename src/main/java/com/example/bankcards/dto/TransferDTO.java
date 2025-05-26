@@ -1,5 +1,6 @@
 package com.example.bankcards.dto;
 
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,6 @@ public class TransferDTO {
     @NotNull(message = "You should point id of card 'to'")
     private UUID toCardId;
 
-    @DecimalMin(value = "0,01")
+    @DecimalMin(value = "0,01", message = "Amount should be greater than 0")
     private BigDecimal amount;
 }

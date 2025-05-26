@@ -1,8 +1,6 @@
 package com.example.bankcards.service;
 
-import com.example.bankcards.dto.CardDTO;
-import com.example.bankcards.dto.CreationCardDTO;
-import com.example.bankcards.dto.TransferDTO;
+import com.example.bankcards.dto.*;
 import com.example.bankcards.entity.Card;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
@@ -24,4 +22,6 @@ public interface CardService {
     Card getCardOrThrowValidationException(UUID id) throws ValidationException;
 
     void checkOwnerOrThrowException(Card card, UUID userId);
+
+    PageDTO<CardDTO> getCardsLikeAdmin(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO);
 }

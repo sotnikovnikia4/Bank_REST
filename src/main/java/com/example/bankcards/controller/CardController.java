@@ -1,11 +1,12 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.CardDTO;
+import com.example.bankcards.dto.CardFilterDTO;
 import com.example.bankcards.dto.CreationCardDTO;
+import com.example.bankcards.dto.PageDTO;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.StatusService;
 import com.example.bankcards.util.ErrorMessageCreator;
-import com.example.bankcards.util.validation.CreationCardValidator;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -25,12 +24,9 @@ public class CardController {
     private final ErrorMessageCreator errorMessageCreator;
     private final CardService cardService;
 
-    private final CreationCardValidator creationCardValidator;
-
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CardDTO create(@RequestBody @Valid CreationCardDTO creationCardDTO, BindingResult bindingResult) {
-        creationCardValidator.validate(creationCardDTO, bindingResult);
         if(bindingResult.hasErrors()) {
             throw new ValidationException(errorMessageCreator.createErrorMessage(bindingResult));
         }
@@ -46,18 +42,12 @@ public class CardController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CardDTO> getAll(
+    public PageDTO<CardDTO> getAll(
             @RequestParam int pageNumber,
             @RequestParam int pageSize,
-            @RequestParam(required = false) String ownerName,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) LocalDate expireBefore,
-            @RequestParam(required = false) LocalDate expireAfter,
-            @RequestParam(required = false) LocalDate balanceMin,
-            @RequestParam(required = false) LocalDate balanceMax
+            @ModelAttribute CardFilterDTO cardFilterDTO
             ){
-//        return cardService.getCardsLikeAdmin(pageNumber, pageSize, ownerName, status, expireBefore, expireAfter, balanceMin, balanceMax);
-        return null;
+        return cardService.getCardsLikeAdmin(pageNumber, pageSize, cardFilterDTO);
     }
 
     @PatchMapping("/{id}/activate")

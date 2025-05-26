@@ -17,7 +17,7 @@ public class CardNumberGenerator {
         random.nextBytes(number);
         int checkSum = 0;
         for(int i = 0; i < CardNumber.CARD_SIZE - 1; i++) {
-            number[i] %= 10;
+            number[i] = (byte) (Math.abs(number[i]) % 10);
 
             if(i % 2 == 0){
                 int toAdd = (byte) (number[i] * 2);

@@ -1,23 +1,26 @@
 package com.example.bankcards.service.implementation;
 
-import com.example.bankcards.dto.CardDTO;
-import com.example.bankcards.dto.CreationCardDTO;
-import com.example.bankcards.dto.TransferDTO;
-import com.example.bankcards.entity.Card;
-import com.example.bankcards.entity.Status;
-import com.example.bankcards.entity.User;
+import com.example.bankcards.dto.*;
+import com.example.bankcards.entity.*;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.*;
 import com.example.bankcards.util.CardNumberGenerator;
 import com.example.bankcards.util.EncryptionHelper;
 import com.example.bankcards.util.ErrorMessageCreator;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,16 +39,21 @@ public class CardServiceImpl implements CardService {
     private final UserDetailsHolder userDetailsHolder;
 
     private final ErrorMessageCreator errorMessageCreator;
+    private final UserService userService;
 
     @Override
     public CardDTO createCard(CreationCardDTO creationCardDTO) {
-
+        if(LocalDate.now().isAfter(creationCardDTO.getExpiresAt())){
+            errorMessageCreator.createErrorMessage("expiresAt", "Value is less than current date");
+        }
+        User owner = userService.getUserOrThrowValidationException(creationCardDTO.getOwnerId(), "ownerId");
+        Status status = statusService.getStatusOrThrowValidationException(StatusService.ACTIVE);
 
         Card card = Card.builder()
-                .owner(User.builder().id(creationCardDTO.getOwnerId()).build())
+                .owner(owner)
                 .expiresAt(creationCardDTO.getExpiresAt())
                 .balance(new BigDecimal(0))
-                .status(Status.builder().status(StatusService.ACTIVE).build())
+                .status(status)
                 .build();
 
         Optional<Card> cardWithSameNumber;
@@ -65,6 +73,7 @@ public class CardServiceImpl implements CardService {
 
         User user = userDetailsHolder.getUserFromSecurityContext();
         if(card.getOwner().getId().equals(user.getId()) || user.getRole().getRole().equals(RoleService.PREFIX_ROLE + RoleService.ADMIN_ROLE)){
+            System.out.println(card);
             return convertToCardDTO(card);
         }
 
@@ -77,6 +86,8 @@ public class CardServiceImpl implements CardService {
         if(card.isEmpty()){
             throw new ValidationException(errorMessageCreator.createErrorMessage("id", "Card with id not found"));
         }
+
+        card.get().setCardNumber(encryptionHelper.decryptCardNumber(secretKey, card.get().getEncryptedCardNumber()));
 
         return card.get();
     }
@@ -132,6 +143,51 @@ public class CardServiceImpl implements CardService {
         if(card.getOwner().getId().compareTo(userId) != 0){
             throw new ValidationException(errorMessageCreator.createErrorMessage("card", "Card does not belong user"));
         }
+    }
+
+    @Override
+    public PageDTO<CardDTO> getCardsLikeAdmin(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO) {
+        if(pageSize <= 0){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
+        }
+
+        Page<Card> pageable = cardRepository.findAll(
+                findCardsSpecification(cardFilterDTO),
+                PageRequest.of(pageNumber, pageSize)
+        );
+
+        return PageDTO.<CardDTO>builder().data(
+                pageable.getContent().stream().map(this::convertToCardDTO).toList()
+        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).build();
+    }
+
+    private Specification<Card> findCardsSpecification(CardFilterDTO cardFilterDTO){
+        return (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if(cardFilterDTO.getStatus() != null && !cardFilterDTO.getStatus().isBlank()){
+                Join<Card, Status> statusJoin = root.join(Card_.STATUS);
+                predicates.add(builder.equal(statusJoin.get(Status_.STATUS), cardFilterDTO.getStatus()));
+            }
+            if(cardFilterDTO.getOwnerName() != null && !cardFilterDTO.getOwnerName().isBlank()){
+                Join<Card, User> ownerJoin = root.join(Card_.OWNER);
+                predicates.add(builder.like(ownerJoin.get(User_.name), "%" + cardFilterDTO.getOwnerName() + "%"));
+            }
+            if (cardFilterDTO.getBalanceMin() != null) {
+                predicates.add(builder.greaterThanOrEqualTo(root.get(Card_.BALANCE), cardFilterDTO.getBalanceMin()));
+            }
+            if (cardFilterDTO.getBalanceMax() != null) {
+                predicates.add(builder.lessThanOrEqualTo(root.get(Card_.BALANCE), cardFilterDTO.getBalanceMax()));
+            }
+
+            if(cardFilterDTO.getExpireBefore() != null){
+                predicates.add(builder.lessThanOrEqualTo(root.get(Card_.EXPIRES_AT), cardFilterDTO.getExpireBefore()));
+            }
+            if(cardFilterDTO.getExpireAfter() != null){
+                predicates.add(builder.greaterThanOrEqualTo(root.get(Card_.EXPIRES_AT), cardFilterDTO.getExpireAfter()));
+            }
+
+            return builder.and(predicates.toArray(Predicate[]::new));
+        };
     }
 
     private CardDTO convertToCardDTO(Card card) {
