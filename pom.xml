@@ -79,12 +79,12 @@
 			<artifactId>java-jwt</artifactId>
 			<version>4.4.0</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>org.hibernate.orm</groupId>-->
-<!--			<artifactId>hibernate-jpamodelgen</artifactId>-->
-<!--			<version>${hibernate-jpamodelgen.version}</version>-->
-<!--			<scope>provided</scope>-->
-<!--		</dependency>-->
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.7.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -119,6 +119,26 @@
 						</path>
 					</annotationProcessorPaths>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.springdoc</groupId>
+				<artifactId>springdoc-openapi-maven-plugin</artifactId>
+				<version>1.4</version> <executions>
+				<execution>
+					<id>generate-openapi-docs</id>
+					<phase>integration-test</phase> <goals>
+					<goal>generate</goal>
+				</goals>
+				</execution>
+			</executions>
+				<configuration>
+					<apiDocsUrl>http://localhost:8080/api/docs</apiDocsUrl>
+					<outputFileName>openapi.yaml</outputFileName>
+					<outputDir>${project.basedir}/src/main/resources/static</outputDir> </configuration>
 			</plugin>
 		</plugins>
 	</build>

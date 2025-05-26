@@ -23,3 +23,11 @@ jwt:
 encryption:
   password: "password"
   salt: "saltsaltsaltsalt"
+
+springdoc:
+  api-docs:
+    path: /api/docs
+  swagger-ui:
+    path: /api/docs/swagger
+    operations-sorter: alpha
+    config-url: ./docs/openapi.yaml
