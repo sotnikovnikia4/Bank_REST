@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface CardService {
     CardDTO createCard(CreationCardDTO creationCardDTO);
 
-    CardDTO getCard(UUID id) throws ValidationException;
+    CardDTO getCardLikeAdmin(UUID id) throws ValidationException;
 
     CardDTO setStatus(UUID id, String active);
 
@@ -24,4 +24,8 @@ public interface CardService {
     void checkOwnerOrThrowException(Card card, UUID userId);
 
     PageDTO<CardDTO> getCardsLikeAdmin(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO);
+
+    PageDTO<CardDTO> getCardsLikeUser(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO);
+
+    CardDTO getCardLikeUser(UUID cardId);
 }

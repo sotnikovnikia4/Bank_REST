@@ -9,6 +9,7 @@ import com.example.bankcards.entity.Role_;
 import com.example.bankcards.entity.User;
 import com.example.bankcards.entity.User_;
 import com.example.bankcards.repository.UserRepository;
+import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.RoleService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.ErrorMessageCreator;
@@ -29,15 +30,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final ErrorMessageCreator errorMessageCreator;
     private final RoleService roleService;
-
-    public UserDTO convertToUserDTO(User user) {
-        return UserDTO.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .login(user.getLogin())
-                .role(user.getRole().getRole().substring(RoleService.PREFIX_ROLE.length()))
-                .build();
-    }
+    private final UserDetailsHolder userDetailsHolder;
 
     @Override
     public UserDTO getUser(UUID id) {
@@ -118,8 +111,8 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public User saveUser(User user){
-        return userRepository.save(user);
+    public UserDTO saveUser(User user){
+        return convertToUserDTO(userRepository.save(user));
     }
 
     @Override
@@ -130,5 +123,19 @@ public class UserServiceImpl implements UserService {
         }
 
         return user.get();
+    }
+
+    @Override
+    public UserDTO getCurrentUserInfo() {
+        return convertToUserDTO(userDetailsHolder.getUserFromSecurityContext());
+    }
+
+    private UserDTO convertToUserDTO(User user) {
+        return UserDTO.builder()
+                .id(user.getId())
+                .name(user.getName())
+                .login(user.getLogin())
+                .role(user.getRole().getRole().substring(RoleService.PREFIX_ROLE.length()))
+                .build();
     }
 }

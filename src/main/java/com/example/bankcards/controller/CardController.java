@@ -37,7 +37,7 @@ public class CardController {
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CardDTO get(@PathVariable UUID id) {
-        return cardService.getCard(id);
+        return cardService.getCardLikeAdmin(id);
     }
 
     @GetMapping

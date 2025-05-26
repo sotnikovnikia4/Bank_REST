@@ -51,10 +51,6 @@ public class SecurityConfig{
                                         "/api/cards/*/block",
                                         "/api/users/**"
                                 ).hasRole(RoleService.ADMIN_ROLE)
-                                .requestMatchers(
-                                        "/api/cards/*"
-                                )
-                                .authenticated()
                                 .anyRequest().permitAll()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)

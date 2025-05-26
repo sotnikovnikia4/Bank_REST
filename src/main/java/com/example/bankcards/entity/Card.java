@@ -25,7 +25,7 @@ public class Card {
     @Column(nullable = false, unique = true)
     private byte[] encryptedCardNumber;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
     private User owner;
 

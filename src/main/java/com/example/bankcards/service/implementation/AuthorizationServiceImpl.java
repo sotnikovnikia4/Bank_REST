@@ -41,9 +41,7 @@ public class AuthorizationServiceImpl implements AuthorizationService {
                 .role(role)
                 .build();
 
-        user = userService.saveUser(user);
-
-        return userService.convertToUserDTO(user);
+        return userService.saveUser(user);
     }
 
     public TokenDTO authenticate(AuthenticationDTO authenticationDTO) {

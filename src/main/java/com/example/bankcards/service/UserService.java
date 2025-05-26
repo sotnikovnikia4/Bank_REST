@@ -17,9 +17,7 @@ public interface UserService {
 
     void checkIfLoginFreeOtherwiseThrowValidationException(String login) throws ValidationException;
 
-    User saveUser(User user);
-
-    UserDTO convertToUserDTO(User user);
+    UserDTO saveUser(User user);
 
     UserDTO getUser(UUID id);
 
@@ -30,4 +28,6 @@ public interface UserService {
     PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO);
 
     User getUserOrThrowValidationException(UUID id, String fieldName) throws ValidationException;
+
+    UserDTO getCurrentUserInfo();
 }

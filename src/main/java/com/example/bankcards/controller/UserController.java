@@ -54,7 +54,7 @@ public class UserController {
 
     @GetMapping("/me")
     public UserDTO getUserInfo(){
-        return userService.convertToUserDTO(userDetailsHolder.getUserFromSecurityContext());
+        return userService.getCurrentUserInfo();
     }
 
     @DeleteMapping("/{id}")
@@ -71,6 +71,22 @@ public class UserController {
         }
 
         return userService.updateUser(id, userDTO);
+    }
+
+    @GetMapping("/me/cards")
+    @ResponseStatus(HttpStatus.OK)
+    public PageDTO<CardDTO> getCards(
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize,
+            @ModelAttribute CardFilterDTO cardFilterDTO
+    ){
+        return cardService.getCardsLikeUser(pageNumber, pageSize, cardFilterDTO);
+    }
+
+    @GetMapping("/me/cards/{cardId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CardDTO getCards(@PathVariable UUID cardId){
+        return cardService.getCardLikeUser(cardId);
     }
 
     @PostMapping("/me/cards/{id}/block-request")
