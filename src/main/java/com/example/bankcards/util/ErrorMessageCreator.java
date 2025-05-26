@@ -1,4 +1,4 @@
-package com.example.bankcards.utl;
+package com.example.bankcards.util;
 
 import org.springframework.validation.BindingResult;
 

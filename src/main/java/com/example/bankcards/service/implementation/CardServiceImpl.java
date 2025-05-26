@@ -9,13 +9,12 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.*;
-import com.example.bankcards.utl.CardNumberGenerator;
-import com.example.bankcards.utl.EncryptionHelper;
-import com.example.bankcards.utl.ErrorMessageCreator;
+import com.example.bankcards.util.CardNumberGenerator;
+import com.example.bankcards.util.EncryptionHelper;
+import com.example.bankcards.util.ErrorMessageCreator;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.View;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;

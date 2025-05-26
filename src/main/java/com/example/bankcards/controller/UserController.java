@@ -5,7 +5,7 @@ import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.BlockRequestService;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.UserService;
-import com.example.bankcards.utl.ErrorMessageCreator;
+import com.example.bankcards.util.ErrorMessageCreator;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;

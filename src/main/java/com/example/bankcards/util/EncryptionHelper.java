@@ -1,4 +1,4 @@
-package com.example.bankcards.utl;
+package com.example.bankcards.util;
 
 import com.example.bankcards.entity.CardNumber;
 import lombok.NonNull;
@@ -6,7 +6,6 @@ import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;

@@ -1,4 +1,4 @@
-package com.example.bankcards.utl;
+package com.example.bankcards.util;
 
 import com.example.bankcards.entity.CardNumber;
 import lombok.RequiredArgsConstructor;

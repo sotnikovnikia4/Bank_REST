@@ -5,7 +5,7 @@ import com.example.bankcards.dto.CreationUserDTO;
 import com.example.bankcards.dto.TokenDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.service.AuthorizationService;
-import com.example.bankcards.utl.ErrorMessageCreator;
+import com.example.bankcards.util.ErrorMessageCreator;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;

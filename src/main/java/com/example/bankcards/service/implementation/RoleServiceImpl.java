@@ -3,7 +3,7 @@ package com.example.bankcards.service.implementation;
 import com.example.bankcards.entity.Role;
 import com.example.bankcards.repository.RoleRepository;
 import com.example.bankcards.service.RoleService;
-import com.example.bankcards.utl.ErrorMessageCreator;
+import com.example.bankcards.util.ErrorMessageCreator;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

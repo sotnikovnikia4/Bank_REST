@@ -1,6 +1,6 @@
-package com.example.bankcards.utl.implementation;
+package com.example.bankcards.util.implementation;
 
-import com.example.bankcards.utl.ErrorMessageCreator;
+import com.example.bankcards.util.ErrorMessageCreator;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
