@@ -44,7 +44,7 @@ public class CardServiceImpl implements CardService {
     @Override
     public CardDTO createCard(CreationCardDTO creationCardDTO) {
         if(LocalDate.now().isAfter(creationCardDTO.getExpiresAt())){
-            errorMessageCreator.createErrorMessage("expiresAt", "Value is less than current date");
+            throw new ValidationException(errorMessageCreator.createErrorMessage("expiresAt", "Value is less than current date"));
         }
         User owner = userService.getUserOrThrowValidationException(creationCardDTO.getOwnerId(), "ownerId");
         Status status = statusService.getStatusOrThrowValidationException(StatusService.ACTIVE);
@@ -73,7 +73,6 @@ public class CardServiceImpl implements CardService {
 
         User user = userDetailsHolder.getUserFromSecurityContext();
         if(card.getOwner().getId().equals(user.getId()) || user.getRole().getRole().equals(RoleService.PREFIX_ROLE + RoleService.ADMIN_ROLE)){
-            System.out.println(card);
             return convertToCardDTO(card);
         }
 
