@@ -2,3 +2,5 @@ databaseChangeLog:
 
   - include:
       file: db/migration/26-01-changelog.yaml
+  - include:
+      file: db/migration/26-02-changelog.yaml

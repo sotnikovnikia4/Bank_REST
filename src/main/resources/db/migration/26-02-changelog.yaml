@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1748282283120-1
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - dropColumn:
+            columnName: encrypted_card_number
+            tableName: card
+  - changeSet:
+      id: 1748282283120-2
+      author: genius
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addColumn:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uc_card_encryptedcardnumber
+                    validateNullable: true
+                  name: encrypted_card_number
+                  type: bytea
+            tableName: card
+

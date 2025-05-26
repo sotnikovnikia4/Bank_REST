@@ -40,14 +40,13 @@ public class EncryptionHelper {
     }
 
     @SneakyThrows
-    public String encryptCardNumber(@NonNull SecretKey key, CardNumber cardNumber) {
-        byte[] encrypted = encrypt(key, cardNumber.getNumber());
-        return new String(encrypted);
+    public byte[] encryptCardNumber(@NonNull SecretKey key, CardNumber cardNumber) {
+        return encrypt(key, cardNumber.getNumber());
     }
 
     @SneakyThrows
-    public CardNumber decryptCardNumber(@NonNull SecretKey key, String encryptedCardNumber) {
-        byte[] decrypted = decrypt(key, encryptedCardNumber.getBytes());
+    public CardNumber decryptCardNumber(@NonNull SecretKey key, byte[] encryptedCardNumber) {
+        byte[] decrypted = decrypt(key, encryptedCardNumber);
         return CardNumber.builder().number(decrypted).build();
     }
 

@@ -10,5 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface CardRepository extends JpaRepository<Card, UUID>, JpaSpecificationExecutor<Card> {
-    Optional<Card> findByEncryptedCardNumber(String encryptedCardNumber);
+    Optional<Card> findByEncryptedCardNumber(byte[] encryptedCardNumber);
 }

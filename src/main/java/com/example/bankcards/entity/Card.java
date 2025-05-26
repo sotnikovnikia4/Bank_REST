@@ -23,7 +23,7 @@ public class Card {
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    private String encryptedCardNumber;
+    private byte[] encryptedCardNumber;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
