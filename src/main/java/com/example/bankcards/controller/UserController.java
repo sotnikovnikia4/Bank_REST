@@ -38,8 +38,14 @@ public class UserController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> getUsers(@RequestParam int pageNumber, @RequestParam int pageSize, @RequestParam(required = false) String name, @RequestParam(required = false) String role){
-        return userService.getUsers()
+    public PageDTO<UserDTO> getUsers(
+            @RequestParam int pageNumber,
+            @RequestParam int pageSize,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String role, 
+            @RequestParam(required = false) String login
+    ){
+        return userService.getUsers(pageNumber, pageSize, name, role, login);
     }
 
     @GetMapping("/{id}")
@@ -48,7 +54,7 @@ public class UserController {
         return userService.getUser(id);
     }
 
-    @GetMapping("/me/info")
+    @GetMapping("/me")
     public UserDTO getUserInfo(){
         return userService.convertToUserDTO(userDetailsHolder.getUserFromSecurityContext());
     }

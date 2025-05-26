@@ -1,19 +1,26 @@
 package com.example.bankcards.service.implementation;
 
+import com.example.bankcards.dto.PageDTO;
 import com.example.bankcards.dto.UpdatingUserDTO;
 import com.example.bankcards.dto.UserDTO;
 import com.example.bankcards.entity.Role;
+import com.example.bankcards.entity.Role_;
 import com.example.bankcards.entity.User;
+import com.example.bankcards.entity.User_;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.service.RoleService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.ErrorMessageCreator;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -33,19 +40,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUser(UUID id) {
-        return convertToUserDTO(getUserOrThrowValidationException(id));
+        return convertToUserDTO(getUserOrThrowValidationException(id, "userId"));
     }
 
     @Override
     public void deleteUser(UUID id) {
-        User user =  getUserOrThrowValidationException(id);
+        User user =  getUserOrThrowValidationException(id, "userId");
 
         userRepository.delete(user);
     }
 
     @Override
     public UserDTO updateUser(UUID id, UpdatingUserDTO userDTO) {
-        User user = getUserOrThrowValidationException(id);
+        User user = getUserOrThrowValidationException(id, "userId");
         Role role = roleService.getRoleOrThrowValidationException(userDTO.getRole());
 
         user.setName(userDTO.getName());
@@ -59,13 +66,46 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> getUserByLogin(String login) {
-        return userRepository.findByLoginIgnoreCase(login);
+    public PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, String name, String role, String login) {
+        if(pageSize <= 0){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
+        }
+
+        if(role != null && !role.isBlank()){
+            role =  RoleService.PREFIX_ROLE + role;
+        }
+
+        Page<User> pageable = userRepository.findAll(
+                findUsersSpecification(name, role, login),
+                PageRequest.of(pageNumber, pageSize)
+        );
+
+        return PageDTO.<UserDTO>builder().data(
+                pageable.getContent().stream().map(this::convertToUserDTO).toList()
+        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).build();
+    }
+
+    private Specification<User> findUsersSpecification(String name, String roleName, String login) {
+        return (root, query, builder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            if(name != null && !name.isBlank()){
+                predicates.add(builder.like(root.get(User_.name), "%" + name + "%"));
+            }
+            if(login != null && !login.isBlank()){
+                predicates.add(builder.like(root.get(User_.login), "%" + login + "%"));
+            }
+            if(roleName != null && !roleName.isBlank()){
+                Join<User, Role> roleJoin = root.join(User_.role);
+                predicates.add(builder.equal(roleJoin.get(Role_.role), roleName));
+            }
+
+            return builder.and(predicates.toArray(Predicate[]::new));
+        };
     }
 
     @Override
-    public Optional<User> getOptionalUserById(UUID id) {
-        return userRepository.findById(id);
+    public Optional<User> getUserByLogin(String login) {
+        return userRepository.findByLoginIgnoreCase(login);
     }
 
     @Override
@@ -81,10 +121,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    private User getUserOrThrowValidationException(UUID id){
+    @Override
+    public User getUserOrThrowValidationException(UUID id, String fieldName) throws ValidationException {
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()) {
-            throw new ValidationException(errorMessageCreator.createErrorMessage("id", "User not found"));
+            throw new ValidationException(errorMessageCreator.createErrorMessage(fieldName, "User not found"));
         }
 
         return user.get();

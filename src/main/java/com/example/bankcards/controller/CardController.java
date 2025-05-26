@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,8 +46,17 @@ public class CardController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CardDTO> getAll(){
-        return null; //TODO
+    public List<CardDTO> getAll(
+//            @RequestParam int pageNumber,
+//            @RequestParam int pageSize,
+//            @RequestParam(required = false) String ownerName,
+//            @RequestParam(required = false) String status,
+//            @RequestParam(required = false) LocalDate expireBefore,
+//            @RequestParam(required = false) LocalDate expireAfter,
+//            @RequestParam(required = false) LocalDate balance,
+//            @RequestParam(required = false) LocalDate expireAfter
+            ){
+        return null;
     }
 
     @PatchMapping("/{id}/activate")
