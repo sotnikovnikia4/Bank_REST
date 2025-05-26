@@ -17,6 +17,7 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -46,6 +47,7 @@ public class CardServiceImpl implements CardService {
 
     private final ErrorMessageCreator errorMessageCreator;
     private final UserService userService;
+    private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
 
     @Override
     public CardDTO createCard(CreationCardDTO creationCardDTO) {
@@ -113,15 +115,17 @@ public class CardServiceImpl implements CardService {
     public List<CardDTO> transfer(TransferDTO transferDTO) {
         Card card1 = getCardOrThrowValidationException(transferDTO.getFromCardId());
         Card card2 = getCardOrThrowValidationException(transferDTO.getToCardId());
-        BigDecimal amount = card1.getBalance();
+        BigDecimal amount = transferDTO.getAmount();
         User user = userDetailsHolder.getUserFromSecurityContext();
 
-        if(!(card1.getOwner().getId().equals(user.getId()) && card2.getOwner().getId().equals(user.getId()))){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("id", "Card 'from' or card 'to' does not belong to user"));
-        }
+        checkOwnerOrThrowException(card1, user.getId());
+        checkOwnerOrThrowException(card2, user.getId());
 
         if(card1.getBalance().compareTo(amount) < 0){
             throw new ValidationException(errorMessageCreator.createErrorMessage("amount", "Card 'from' has less money than amount"));
+        }
+        else if(card1.getBalance().compareTo(BigDecimal.ZERO) == 0){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("amount", "Card 'from' has no money"));
         }
 
         card1.setBalance(card1.getBalance().subtract(amount));
@@ -184,6 +188,20 @@ public class CardServiceImpl implements CardService {
         Card card = getCardOrThrowValidationException(cardId);
         User user = userDetailsHolder.getUserFromSecurityContext();
         checkOwnerOrThrowException(card, user.getId());
+        return convertToCardDTO(card);
+    }
+
+    @Override
+    public CardDTO addMoney(UUID cardId, BigDecimal amount) {
+        if(amount.compareTo(BigDecimal.ZERO) <= 0){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("amount", "Amount should be greater than 0"));
+        }
+
+        Card card = getCardOrThrowValidationException(cardId);
+        card.setBalance(card.getBalance().add(amount));
+
+        card = cardRepository.save(card);
+
         return convertToCardDTO(card);
     }
 

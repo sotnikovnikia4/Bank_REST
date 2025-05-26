@@ -5,6 +5,7 @@ import com.example.bankcards.entity.Card;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,4 +29,6 @@ public interface CardService {
     PageDTO<CardDTO> getCardsLikeUser(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO);
 
     CardDTO getCardLikeUser(UUID cardId);
+
+    CardDTO addMoney(UUID cardId, BigDecimal amount);
 }

@@ -22,6 +22,7 @@ public class TransferDTO {
     @NotNull(message = "You should point id of card 'to'")
     private UUID toCardId;
 
-    @DecimalMin(value = "0,01", message = "Amount should be greater than 0")
+    @DecimalMin(value = "0.01", message = "Amount should be greater than 0")
+    @NotNull(message = "You should point amount")
     private BigDecimal amount;
 }

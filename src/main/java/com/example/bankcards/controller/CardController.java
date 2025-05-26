@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @RestController
@@ -50,16 +51,22 @@ public class CardController {
         return cardService.getCardsLikeAdmin(pageNumber, pageSize, cardFilterDTO);
     }
 
-    @PatchMapping("/{id}/activate")
+    @PatchMapping("/{cardId}/activate")
     @ResponseStatus(HttpStatus.OK)
-    public CardDTO activate(@PathVariable UUID id) {
-        return cardService.setStatus(id, StatusService.ACTIVE);
+    public CardDTO activate(@PathVariable UUID cardId) {
+        return cardService.setStatus(cardId, StatusService.ACTIVE);
     }
 
-    @PatchMapping("/{id}/block")
+    @PatchMapping("/{cardId}/block")
     @ResponseStatus(HttpStatus.OK)
-    public CardDTO block(@PathVariable UUID id) {
-        return cardService.setStatus(id, StatusService.BLOCKED);
+    public CardDTO block(@PathVariable UUID cardId) {
+        return cardService.setStatus(cardId, StatusService.BLOCKED);
+    }
+
+    @PatchMapping("/{cardId}/add-money")
+    @ResponseStatus(HttpStatus.OK)
+    public CardDTO block(@PathVariable UUID cardId, @RequestParam BigDecimal amount) {
+        return cardService.addMoney(cardId, amount);
     }
 
     @DeleteMapping("/{id}")
