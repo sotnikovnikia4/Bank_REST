@@ -13,8 +13,6 @@ import java.util.UUID;
 public interface UserService {
     Optional<User> getUserByLogin(String login);
 
-//    Optional<User> getOptionalUserById(UUID id);
-
     void checkIfLoginFreeOtherwiseThrowValidationException(String login) throws ValidationException;
 
     UserDTO saveUser(User user);

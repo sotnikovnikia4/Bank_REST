@@ -1,9 +1,7 @@
 package com.example.bankcards.security;
 
 import com.example.bankcards.entity.User;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,11 +10,7 @@ public final class UserDetailsHolder {
         return ((UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
     }
 
-    public UserDetails getUserDetailsSecurityContext(){
-        return (UserDetailsImpl)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    }
-
-    public User getUserFromPrincipal(Object principal){
+    public User getUserFromPrincipal(Object principal) throws RuntimeException{
         if(principal instanceof UserDetailsImpl){
             return ((UserDetailsImpl)principal).getUser();
         }

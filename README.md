@@ -11,3 +11,6 @@
 5. Ввести команду `docker-compose build`
 6. Ввести команду `docker-compose up`
 7. Перейти на `http://localhost:8080/api/docs/swagger` для просмотра документации `OpenAPI`
+
+## Пример деплоя приложения
+По адресу `https://nikita-sotnikov:8070/api/docs/swagger` располагается готовый проект с подключенным https
