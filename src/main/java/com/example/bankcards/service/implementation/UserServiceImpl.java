@@ -17,12 +17,17 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +36,13 @@ public class UserServiceImpl implements UserService {
     private final ErrorMessageCreator errorMessageCreator;
     private final RoleService roleService;
     private final UserDetailsHolder userDetailsHolder;
+    private final PasswordEncoder passwordEncoder;
+    private final Converter<User, UserDTO> converterUserDTO;
+    private final Converter<Page<User>, PageDTO<UserDTO>> converterPageDTO;
 
     @Override
     public UserDTO getUser(UUID id) {
-        return convertToUserDTO(getUserOrThrowValidationException(id, "userId"));
+        return converterUserDTO.convert(getUserOrThrowValidationException(id, "userId"));
     }
 
     @Override
@@ -51,28 +59,29 @@ public class UserServiceImpl implements UserService {
 
         user.setName(userDTO.getName());
         user.setLogin(userDTO.getLogin());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setRole(role);
 
         user = userRepository.save(user);
 
-        return convertToUserDTO(user);
+        return converterUserDTO.convert(user);
     }
 
     @Override
-    public PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO) {
+    public PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO) throws ValidationException{
         if(pageSize <= 0){
             throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
         }
+        if(pageNumber < 0){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("pageNumber", "Page's number should be non negative"));
+        }
 
-        Page<User> pageable = userRepository.findAll(
+        Page<User> page = userRepository.findAll(
                 findUsersSpecification(userFilterDTO),
                 PageRequest.of(pageNumber, pageSize)
         );
 
-        return PageDTO.<UserDTO>builder().data(
-                pageable.getContent().stream().map(this::convertToUserDTO).toList()
-        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).totalElements(pageable.getTotalElements()).build();
+        return converterPageDTO.convert(page);
     }
 
     private Specification<User> findUsersSpecification(UserFilterDTO userFilterDTO) {
@@ -112,7 +121,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public UserDTO saveUser(User user){
-        return convertToUserDTO(userRepository.save(user));
+        return converterUserDTO.convert(userRepository.save(user));
     }
 
     @Override
@@ -127,15 +136,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getCurrentUserInfo() {
-        return convertToUserDTO(userDetailsHolder.getUserFromSecurityContext());
-    }
-
-    private UserDTO convertToUserDTO(User user) {
-        return UserDTO.builder()
-                .id(user.getId())
-                .name(user.getName())
-                .login(user.getLogin())
-                .role(user.getRole().getRole().substring(RoleService.PREFIX_ROLE.length()))
-                .build();
+        return converterUserDTO.convert(userDetailsHolder.getUserFromSecurityContext());
     }
 }

@@ -5,24 +5,23 @@ import com.example.bankcards.entity.*;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.CardService;
-import com.example.bankcards.service.RoleService;
 import com.example.bankcards.service.StatusService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.CardNumberGenerator;
 import com.example.bankcards.util.EncryptionHelper;
 import com.example.bankcards.util.ErrorMessageCreator;
+import com.example.bankcards.util.converter.ConverterPageDTO;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.SecretKey;
 import java.math.BigDecimal;
@@ -47,7 +46,8 @@ public class CardServiceImpl implements CardService {
 
     private final ErrorMessageCreator errorMessageCreator;
     private final UserService userService;
-    private final DataSourceTransactionManagerAutoConfiguration dataSourceTransactionManagerAutoConfiguration;
+    private final Converter<Card, CardDTO> cardConverter;
+    private final ConverterPageDTO<Card, CardDTO> cardPageConverter;
 
     @Override
     public CardDTO createCard(CreationCardDTO creationCardDTO) {
@@ -72,13 +72,13 @@ public class CardServiceImpl implements CardService {
         }while(cardWithSameNumber.isPresent());
 
         card = cardRepository.save(card);
-        return convertToCardDTO(card);
+        return cardConverter.convert(card);
     }
 
     @Override
     public CardDTO getCardLikeAdmin(UUID id) throws ValidationException {
         Card card = getCardOrThrowValidationException(id);
-        return convertToCardDTO(card);
+        return cardConverter.convert(card);
     }
 
     @Override
@@ -108,7 +108,7 @@ public class CardServiceImpl implements CardService {
         card.setStatus(status);
         card = cardRepository.save(card);
 
-        return convertToCardDTO(card);
+        return cardConverter.convert(card);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class CardServiceImpl implements CardService {
         card1 = cardRepository.save(card1);
         card2 = cardRepository.save(card2);
 
-        return List.of(convertToCardDTO(card1), convertToCardDTO(card2));
+        return List.of(cardConverter.convert(card1), cardConverter.convert(card2));
     }
 
     @Override
@@ -157,14 +157,12 @@ public class CardServiceImpl implements CardService {
             throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
         }
 
-        Page<Card> pageable = cardRepository.findAll(
+        Page<Card> page = cardRepository.findAll(
                 findCardsSpecificationLikeAdmin(cardFilterDTO),
                 PageRequest.of(pageNumber, pageSize)
         );
 
-        return PageDTO.<CardDTO>builder().data(
-                pageable.getContent().stream().map(this::convertToCardDTO).toList()
-        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).totalElements(pageable.getTotalElements()).build();
+        return cardPageConverter.convert(page);
     }
 
     @Override
@@ -179,7 +177,7 @@ public class CardServiceImpl implements CardService {
         );
 
         return PageDTO.<CardDTO>builder().data(
-                pageable.getContent().stream().map(this::convertToCardDTO).toList()
+                pageable.getContent().stream().map(cardConverter::convert).toList()
         ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).totalElements(pageable.getTotalElements()).build();
     }
 
@@ -188,7 +186,7 @@ public class CardServiceImpl implements CardService {
         Card card = getCardOrThrowValidationException(cardId);
         User user = userDetailsHolder.getUserFromSecurityContext();
         checkOwnerOrThrowException(card, user.getId());
-        return convertToCardDTO(card);
+        return cardConverter.convert(card);
     }
 
     @Override
@@ -202,7 +200,7 @@ public class CardServiceImpl implements CardService {
 
         card = cardRepository.save(card);
 
-        return convertToCardDTO(card);
+        return cardConverter.convert(card);
     }
 
     private Specification<Card> findCardsSpecificationLikeUser(CardFilterDTO cardFilterDTO){
@@ -249,20 +247,5 @@ public class CardServiceImpl implements CardService {
 
             return builder.and(predicates.toArray(Predicate[]::new));
         };
-    }
-
-    private CardDTO convertToCardDTO(Card card) {
-        if(card.getCardNumber() == null){
-            card.setCardNumber(encryptionHelper.decryptCardNumber(secretKey, card.getEncryptedCardNumber()));
-        }
-
-        return CardDTO.builder()
-                .id(card.getId())
-                .balance(card.getBalance())
-                .expiresAt(card.getExpiresAt())
-                .status(card.getStatus().getStatus())
-                .ownerId(card.getOwner().getId())
-                .cardNumber(card.getCardNumber().getMask())
-                .build();
     }
 }

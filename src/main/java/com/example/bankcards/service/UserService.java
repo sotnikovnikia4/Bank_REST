@@ -23,7 +23,7 @@ public interface UserService {
 
     UserDTO updateUser(UUID id, UpdatingUserDTO userDTO);
 
-    PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO);
+    PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO) throws ValidationException;
 
     User getUserOrThrowValidationException(UUID id, String fieldName) throws ValidationException;
 
