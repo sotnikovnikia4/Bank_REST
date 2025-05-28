@@ -102,7 +102,14 @@ public class UserController {
     }
 
     @GetMapping("/block-requests")
-    public List<BlockRequestDTO> getAllBlockRequests(@RequestParam int pageNumber, @RequestParam int pageSize){
+    @ResponseStatus(HttpStatus.OK)
+    public PageDTO<BlockRequestDTO> getAllBlockRequests(@RequestParam int pageNumber, @RequestParam int pageSize){
         return blockRequestService.getAll(pageNumber, pageSize);
+    }
+
+    @GetMapping("/block-requests/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public BlockRequestDTO getBlockRequest(@PathVariable UUID id){
+        return blockRequestService.getOne(id);
     }
 }

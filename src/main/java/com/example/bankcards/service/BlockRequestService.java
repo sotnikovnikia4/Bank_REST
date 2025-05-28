@@ -1,6 +1,7 @@
 package com.example.bankcards.service;
 
 import com.example.bankcards.dto.BlockRequestDTO;
+import com.example.bankcards.dto.PageDTO;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,5 +12,7 @@ public interface BlockRequestService {
 
     void closeBlockRequest(UUID id);
 
-    List<BlockRequestDTO> getAll(int pageNumber, int pageSize);
+    PageDTO<BlockRequestDTO> getAll(int pageNumber, int pageSize);
+
+    BlockRequestDTO getOne(UUID id);
 }

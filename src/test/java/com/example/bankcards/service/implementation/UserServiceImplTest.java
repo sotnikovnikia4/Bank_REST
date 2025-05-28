@@ -127,7 +127,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void testGetUsersWhenNoUsersFound_ShouldCallConverterDTO() {
+    void testGetUsersWhenCorrectInput_ShouldCallConverterDTO() {
         Page<User> page = Page.empty();
         doReturn(page).when(userRepository).findAll(any(Specification.class), any(PageRequest.class));
         doReturn(PageDTO.builder().build()).when(converterPageDTO).convert(page);

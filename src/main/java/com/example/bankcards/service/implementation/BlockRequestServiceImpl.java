@@ -1,6 +1,7 @@
 package com.example.bankcards.service.implementation;
 
 import com.example.bankcards.dto.BlockRequestDTO;
+import com.example.bankcards.dto.PageDTO;
 import com.example.bankcards.entity.BlockRequest;
 import com.example.bankcards.entity.Card;
 import com.example.bankcards.entity.User;
@@ -9,8 +10,11 @@ import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.BlockRequestService;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.util.ErrorMessageCreator;
+import com.example.bankcards.util.PageSizeAndNumberValidator;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +30,9 @@ public class BlockRequestServiceImpl implements BlockRequestService {
     private final BlockRequestRepository blockRequestRepository;
 
     private final ErrorMessageCreator errorMessageCreator;
+    private final Converter<BlockRequest, BlockRequestDTO> requestConverter;
+    private final Converter<Page<BlockRequest>, PageDTO<BlockRequestDTO>> pageConverter;
+    private final PageSizeAndNumberValidator pageSizeAndNumberValidator;
 
     @Override
     public void createBlockRequest(UUID cardId) {
@@ -54,13 +61,22 @@ public class BlockRequestServiceImpl implements BlockRequestService {
     }
 
     @Override
-    public List<BlockRequestDTO> getAll(int pageNumber, int pageSize) {
-        List<BlockRequest> blockRequests = blockRequestRepository.findAll(PageRequest.of(pageNumber, pageSize)).getContent();
+    public PageDTO<BlockRequestDTO> getAll(int pageNumber, int pageSize) {
+        pageSizeAndNumberValidator.validateOrThrowValidationException(pageNumber, pageSize);
 
-        return blockRequests.stream().map(this::convertToBlockRequestDTO).toList();
+        Page<BlockRequest> page = blockRequestRepository.findAll(PageRequest.of(pageNumber, pageSize));
+
+        return pageConverter.convert(page);
     }
 
-    private BlockRequestDTO convertToBlockRequestDTO(BlockRequest blockRequest){
-        return BlockRequestDTO.builder().id(blockRequest.getId()).cardId(blockRequest.getCard().getId()).build();
+    @Override
+    public BlockRequestDTO getOne(UUID id) {
+        Optional<BlockRequest> blockRequest = blockRequestRepository.findById(id);
+
+        if (blockRequest.isEmpty()) {
+            throw new ValidationException(errorMessageCreator.createErrorMessage("id", "Block request with this id does not exist"));
+        }
+
+        return requestConverter.convert(blockRequest.get());
     }
 }
