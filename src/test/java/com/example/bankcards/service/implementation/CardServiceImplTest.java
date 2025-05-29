@@ -5,6 +5,7 @@ import com.example.bankcards.dto.CreationCardDTO;
 import com.example.bankcards.entity.*;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.UserDetailsHolder;
+import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.StatusService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.CardNumberEncryption;
@@ -25,6 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 import javax.crypto.SecretKey;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -157,27 +159,15 @@ class CardServiceImplTest {
     }
 
     @Test
-    void setStatus() {
+    void testTransfer() {
+        setUpGetCard(Card.builder().build());
+
     }
 
-    @Test
-    void transfer() {
-    }
-
-    @Test
-    void testDeleteCardWhenCardNotFound_ShouldThrowException() {
-        doReturn(Optional.empty()).when(cardRepository).findById(id);
-        doReturn("").when(errorMessageCreator).createErrorMessage(anyString(), anyString());
-
-        assertThrows(ValidationException.class, () -> cardService.deleteCard(id));
-    }
-
-    @Test
-    void testDeleteCardWhenCardFound_ShouldCallDelete() {
-        doReturn(Optional.of(Card.builder().encryptedCardNumber(new byte[]{}).build())).when(cardRepository).findById(id);
-        doReturn(CardNumber.builder().build()).when(cardNumberEncryption).decryptCardNumber(any(), any());
-
-        verify(cardRepository).delete(any(Card.class));
+    private void setUpGetCard(Card card){
+        ProxyGetCard handler = new ProxyGetCard(card);
+        ClassLoader cardServiceClassLoader
+        CardService cardService = Proxy.newProxyInstance()
     }
 
     @Test

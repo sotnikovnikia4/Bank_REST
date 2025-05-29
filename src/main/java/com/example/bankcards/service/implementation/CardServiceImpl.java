@@ -118,6 +118,11 @@ public class CardServiceImpl implements CardService {
     public List<CardDTO> transfer(TransferDTO transferDTO) {
         Card card1 = getCardOrThrowValidationException(transferDTO.getFromCardId());
         Card card2 = getCardOrThrowValidationException(transferDTO.getToCardId());
+
+        if(card1.getId().equals(card2.getId())){
+            throw new ValidationException(errorMessageCreator.createErrorMessage("toCardId", "toCardId should be different from fromCardId"));
+        }
+
         BigDecimal amount = transferDTO.getAmount();
         User user = userDetailsHolder.getUserFromSecurityContext();
 
