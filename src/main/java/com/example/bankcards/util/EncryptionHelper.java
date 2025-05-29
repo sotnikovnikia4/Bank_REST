@@ -1,6 +1,5 @@
 package com.example.bankcards.util;
 
-import com.example.bankcards.entity.CardNumber;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
@@ -15,19 +14,10 @@ import java.security.SecureRandom;
 
 @Component
 public class EncryptionHelper {
-
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final int KEY_ITERATION_COUNT = 100_000;
     private static final int KEY_SIZE = 32;
     private static final int IV_SIZE = 16;
-
-//    @SneakyThrows
-//    public SecretKey generateKey() {
-//        KeyGenerator generator = KeyGenerator.getInstance("AES");
-//        int keySizeBits = KEY_SIZE * 8;
-//        generator.init(keySizeBits, RANDOM);
-//        return generator.generateKey();
-//    }
 
     @SneakyThrows
     public SecretKey generateKey(char[] password, byte[] salt) {
@@ -37,17 +27,6 @@ public class EncryptionHelper {
         SecretKey temporaryKey = factory.generateSecret(keySpec);
         keySpec.clearPassword();
         return new SecretKeySpec(temporaryKey.getEncoded(), "AES");
-    }
-
-    @SneakyThrows
-    public byte[] encryptCardNumber(@NonNull SecretKey key, CardNumber cardNumber) {
-        return encrypt(key, cardNumber.getNumber());
-    }
-
-    @SneakyThrows
-    public CardNumber decryptCardNumber(@NonNull SecretKey key, byte[] encryptedCardNumber) {
-        byte[] decrypted = decrypt(key, encryptedCardNumber);
-        return CardNumber.builder().number(decrypted).build();
     }
 
     @SneakyThrows
@@ -84,5 +63,4 @@ public class EncryptionHelper {
         System.arraycopy(concatenatedBytes, IV_SIZE, cipherBytes, 0, concatenatedBytes.length - IV_SIZE);
         return new byte[][]{ivBytes, cipherBytes};
     }
-
 }

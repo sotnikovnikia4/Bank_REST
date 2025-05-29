@@ -8,8 +8,9 @@ import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.StatusService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.CardNumberGenerator;
-import com.example.bankcards.util.EncryptionHelper;
+import com.example.bankcards.util.CardNumberEncryption;
 import com.example.bankcards.util.ErrorMessageCreator;
+import com.example.bankcards.util.PageSizeAndNumberValidator;
 import com.example.bankcards.util.converter.ConverterPageDTO;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Join;
@@ -36,7 +37,7 @@ import java.util.UUID;
 public class CardServiceImpl implements CardService {
 
     private final CardRepository cardRepository;
-    private final EncryptionHelper encryptionHelper;
+    private final CardNumberEncryption cardNumberEncryption;
     private final SecretKey secretKey;
     private final CardNumberGenerator cardNumberGenerator;
 
@@ -48,6 +49,8 @@ public class CardServiceImpl implements CardService {
     private final UserService userService;
     private final Converter<Card, CardDTO> cardConverter;
     private final ConverterPageDTO<Card, CardDTO> cardPageConverter;
+
+    private final PageSizeAndNumberValidator pageSizeAndNumberValidator;
 
     @Override
     public CardDTO createCard(CreationCardDTO creationCardDTO) {
@@ -67,7 +70,7 @@ public class CardServiceImpl implements CardService {
         Optional<Card> cardWithSameNumber;
         do{
             card.setCardNumber(cardNumberGenerator.generateCardNumber());
-            card.setEncryptedCardNumber(encryptionHelper.encryptCardNumber(secretKey, card.getCardNumber()));
+            card.setEncryptedCardNumber(cardNumberEncryption.encryptCardNumber(secretKey, card.getCardNumber()));
             cardWithSameNumber = cardRepository.findByEncryptedCardNumber(card.getEncryptedCardNumber());
         }while(cardWithSameNumber.isPresent());
 
@@ -88,7 +91,7 @@ public class CardServiceImpl implements CardService {
             throw new ValidationException(errorMessageCreator.createErrorMessage("id", "Card with id not found"));
         }
 
-        card.get().setCardNumber(encryptionHelper.decryptCardNumber(secretKey, card.get().getEncryptedCardNumber()));
+        card.get().setCardNumber(cardNumberEncryption.decryptCardNumber(secretKey, card.get().getEncryptedCardNumber()));
 
         return card.get();
     }
@@ -153,9 +156,7 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public PageDTO<CardDTO> getCardsLikeAdmin(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO) {
-        if(pageSize <= 0){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
-        }
+        pageSizeAndNumberValidator.validateOrThrowValidationException(pageNumber, pageSize);
 
         Page<Card> page = cardRepository.findAll(
                 findCardsSpecificationLikeAdmin(cardFilterDTO),
@@ -167,18 +168,14 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public PageDTO<CardDTO> getCardsLikeUser(int pageNumber, int pageSize, CardFilterDTO cardFilterDTO) {
-        if(pageSize <= 0){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
-        }
+        pageSizeAndNumberValidator.validateOrThrowValidationException(pageNumber, pageSize);
 
-        Page<Card> pageable = cardRepository.findAll(
+        Page<Card> page = cardRepository.findAll(
                 findCardsSpecificationLikeUser(cardFilterDTO),
                 PageRequest.of(pageNumber, pageSize)
         );
 
-        return PageDTO.<CardDTO>builder().data(
-                pageable.getContent().stream().map(cardConverter::convert).toList()
-        ).totalPages(pageable.getTotalPages()).pageSize(pageable.getSize()).pageNumber(pageable.getNumber()).totalElements(pageable.getTotalElements()).build();
+        return cardPageConverter.convert(page);
     }
 
     @Override

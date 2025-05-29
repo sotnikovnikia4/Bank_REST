@@ -1,5 +1,6 @@
 package com.example.bankcards.config;
 
+import com.example.bankcards.util.CardNumberEncryption;
 import com.example.bankcards.util.EncryptionHelper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

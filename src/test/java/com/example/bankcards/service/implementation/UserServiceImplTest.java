@@ -9,6 +9,7 @@ import com.example.bankcards.entity.User;
 import com.example.bankcards.repository.UserRepository;
 import com.example.bankcards.service.RoleService;
 import com.example.bankcards.util.ErrorMessageCreator;
+import com.example.bankcards.util.PageSizeAndNumberValidator;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,8 @@ class UserServiceImplTest {
     private Converter<User, UserDTO> converterUserDTO;
     @Mock
     private Converter<Page<User>, PageDTO<UserDTO>> converterPageDTO;
+    @Mock
+    private PageSizeAndNumberValidator pageSizeAndNumberValidator;
 
     private UserServiceImpl userServiceImpl;
 
@@ -59,7 +62,8 @@ class UserServiceImplTest {
                 null,
                 passwordEncoder,
                 converterUserDTO,
-                converterPageDTO
+                converterPageDTO,
+                pageSizeAndNumberValidator
         );
     }
 
@@ -112,18 +116,10 @@ class UserServiceImplTest {
 
 
     @Test
-    void testGetUsersWhenPageSizeLessOrEqualZero_ShouldThrowException() {
-        doReturn("message").when(errorMessageCreator).createErrorMessage(any(), any());
+    void testGetUsersWhenIncorrectInput_ShouldThrowException() {
+        doThrow(new ValidationException()).when(pageSizeAndNumberValidator).validateOrThrowValidationException(anyInt(), anyInt());
 
         assertThrows(ValidationException.class, () -> userServiceImpl.getUsers(0, -1, UserFilterDTO.builder().build()));
-        assertThrows(ValidationException.class, () -> userServiceImpl.getUsers(0, 0, UserFilterDTO.builder().build()));
-    }
-
-    @Test
-    void testGetUsersWhenPageNumberLessZero_ShouldThrowException() {
-        doReturn("message").when(errorMessageCreator).createErrorMessage(any(), any());
-
-        assertThrows(ValidationException.class, () -> userServiceImpl.getUsers(-1, 10, UserFilterDTO.builder().build()));
     }
 
     @Test

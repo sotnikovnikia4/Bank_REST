@@ -13,6 +13,7 @@ import com.example.bankcards.security.UserDetailsHolder;
 import com.example.bankcards.service.RoleService;
 import com.example.bankcards.service.UserService;
 import com.example.bankcards.util.ErrorMessageCreator;
+import com.example.bankcards.util.PageSizeAndNumberValidator;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.validation.ValidationException;
@@ -39,6 +40,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final Converter<User, UserDTO> converterUserDTO;
     private final Converter<Page<User>, PageDTO<UserDTO>> converterPageDTO;
+
+    private final PageSizeAndNumberValidator pageSizeAndNumberValidator;
 
     @Override
     public UserDTO getUser(UUID id) {
@@ -69,12 +72,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageDTO<UserDTO> getUsers(int pageNumber, int pageSize, UserFilterDTO userFilterDTO) throws ValidationException{
-        if(pageSize <= 0){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("pageSize", "Page's size should be greater than 0"));
-        }
-        if(pageNumber < 0){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("pageNumber", "Page's number should be non negative"));
-        }
+        pageSizeAndNumberValidator.validateOrThrowValidationException(pageNumber, pageSize);
 
         Page<User> page = userRepository.findAll(
                 findUsersSpecification(userFilterDTO),
