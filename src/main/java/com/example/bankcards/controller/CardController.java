@@ -65,7 +65,7 @@ public class CardController {
 
     @PatchMapping("/{cardId}/add-money")
     @ResponseStatus(HttpStatus.OK)
-    public CardDTO block(@PathVariable UUID cardId, @RequestParam BigDecimal amount) {
+    public CardDTO addMoney(@PathVariable UUID cardId, @RequestParam BigDecimal amount) {
         return cardService.addMoney(cardId, amount);
     }
 
