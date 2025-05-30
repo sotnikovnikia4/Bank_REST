@@ -20,8 +20,8 @@ spring:
 #    enabled: false
 
 jwt:
-  secret: SECRET
-  issuer: localhost
+  secret: "SECRET"
+  issuer: "${server.domain}:${server.port}"
   days_until_expiration: 1
 
 encryption:
@@ -41,3 +41,5 @@ cors:
 server:
   ssl:
     enabled: false
+  domain: localhost
+  port: 8080

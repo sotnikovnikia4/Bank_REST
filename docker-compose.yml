@@ -8,6 +8,7 @@ services:
       - postgres
     environment:
       SPRING_APPLICATION_JSON: '{
+        "jwt.secret": "$JWT_SECRET",
         "server.domain": "$SERVER_DOMAIN",
         "server.port": $SERVER_PORT,
         "cors.allowedOrigins": "$CORS_ALLOWED_ORIGINS",
