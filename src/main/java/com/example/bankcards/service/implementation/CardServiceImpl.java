@@ -132,9 +132,6 @@ public class CardServiceImpl implements CardService {
         if(card1.getBalance().compareTo(amount) < 0){
             throw new ValidationException(errorMessageCreator.createErrorMessage("amount", "Card 'from' has less money than amount"));
         }
-        else if(card1.getBalance().compareTo(BigDecimal.ZERO) == 0){
-            throw new ValidationException(errorMessageCreator.createErrorMessage("amount", "Card 'from' has no money"));
-        }
 
         card1.setBalance(card1.getBalance().subtract(amount));
         card2.setBalance(card2.getBalance().add(amount));

@@ -2,6 +2,7 @@ package com.example.bankcards.service.implementation;
 
 import com.example.bankcards.dto.CardDTO;
 import com.example.bankcards.dto.CreationCardDTO;
+import com.example.bankcards.dto.TransferDTO;
 import com.example.bankcards.entity.*;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.security.UserDetailsHolder;
@@ -22,6 +23,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import javax.crypto.SecretKey;
 
@@ -29,6 +33,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -70,12 +75,12 @@ class CardServiceImplTest {
     @InjectMocks
     private CardServiceImpl cardService;
 
-    private UUID id;
+    private final UUID id = UUID.fromString("d1ce02c7-b511-4c75-826a-4bbcd7baa9f6");
+    private final UUID id2 = UUID.fromString("769f47be-8ff5-48d1-89fd-081158e213ac");
 
     @BeforeEach
     @SneakyThrows
     void setUp(){
-        id = UUID.randomUUID();
         Field fieldCardConverter = CardServiceImpl.class.getDeclaredField("cardConverter");
         Field fieldPageCardConverter = CardServiceImpl.class.getDeclaredField("cardPageConverter");
         fieldCardConverter.setAccessible(true);
@@ -159,34 +164,139 @@ class CardServiceImplTest {
     }
 
     @Test
-    void testTransfer() {
-        setUpGetCard(Card.builder().build());
+    void testSetStatusWhenStatusExpired_ShouldThrowValidationException(){
+        Status status = Status.builder().status(StatusService.EXPIRED).build();
+        doAnswer(answer -> Optional.of(Card.builder().id(answer.getArgument(0)).status(Status.builder().status(StatusService.ACTIVE).build()).build())).when(cardRepository).findById(any());
+        doReturn(Status.builder().status(status.getStatus()).build()).when(statusService).getStatusOrThrowValidationException(anyString());
 
-    }
-
-    private void setUpGetCard(Card card){
-        ProxyGetCard handler = new ProxyGetCard(card);
-        ClassLoader cardServiceClassLoader
-        CardService cardService = Proxy.newProxyInstance()
+        assertThrows(ValidationException.class, () -> cardService.setStatus(id, status.getStatus()));
     }
 
     @Test
-    void checkOwnerOrThrowException() {
+    void testSetStatusWhenCardExpired_ShouldThrowValidationException(){
+        Status status = Status.builder().status(StatusService.ACTIVE).build();
+        doAnswer(answer -> Optional.of(Card.builder().id(answer.getArgument(0)).status(Status.builder().status(StatusService.EXPIRED).build()).build())).when(cardRepository).findById(any());
+        doReturn(Status.builder().status(status.getStatus()).build()).when(statusService).getStatusOrThrowValidationException(anyString());
+
+        assertThrows(ValidationException.class, () -> cardService.setStatus(id, status.getStatus()));
     }
 
     @Test
-    void getCardsLikeAdmin() {
+    void testSetStatusWhenInputCorrect_ShouldCallConverterAndSave(){
+        Status status = Status.builder().status(StatusService.ACTIVE).build();
+        Card card = Card.builder().id(UUID.randomUUID()).status(status).build();
+
+        doAnswer(answer -> Optional.of(card)).when(cardRepository).findById(any());
+
+        doReturn(Status.builder().status(status.getStatus()).build()).when(statusService).getStatusOrThrowValidationException(anyString());
+
+        cardService.setStatus(id, status.getStatus());
+        assertEquals(status, card.getStatus());
+        verify(cardConverter).convert(any());
+        verify(cardRepository).save(any());
     }
 
     @Test
-    void getCardsLikeUser() {
+    void testTransferWhenCardsTheSame_ShouldThrowValidationException(){
+        doReturn("").when(errorMessageCreator).createErrorMessage(anyString(), anyString());
+        doAnswer(answer -> Optional.of(Card.builder().id(answer.getArgument(0)).build())).when(cardRepository).findById(any());
+
+        TransferDTO transferDTO = TransferDTO.builder().amount(BigDecimal.TEN).fromCardId(id).toCardId(id).build();
+
+        assertThrows(ValidationException.class, () -> cardService.transfer(transferDTO));
     }
 
     @Test
-    void getCardLikeUser() {
+    void testTransferWhenCardsNotBelongUser_ShouldThrowValidationException(){
+        User user = User.builder().id(id).build();
+
+        doReturn("").when(errorMessageCreator).createErrorMessage(anyString(), anyString());
+        doAnswer(answer -> Optional.of(Card.builder().id(answer.getArgument(0)).balance(BigDecimal.TEN).owner(User.builder().id(id2).build()).build())).when(cardRepository).findById(any());
+        doReturn(user).when(userDetailsHolder).getUserFromSecurityContext();
+
+        TransferDTO transferDTO = TransferDTO.builder().amount(BigDecimal.TEN).fromCardId(id).toCardId(id2).build();
+
+        assertThrows(ValidationException.class, () -> cardService.transfer(transferDTO)).getMessage();
     }
 
     @Test
-    void addMoney() {
+    void testTransferWhenAmountGreaterThanBalanceOnCardFrom_ShouldThrowValidationException(){
+        User user = User.builder().id(id).build();
+
+        doReturn("").when(errorMessageCreator).createErrorMessage(anyString(), anyString());
+        doAnswer(answer -> Optional.of(Card.builder().id(answer.getArgument(0)).balance(BigDecimal.TEN).owner(User.builder().id(id2).build()).build())).when(cardRepository).findById(any());
+        doReturn(user).when(userDetailsHolder).getUserFromSecurityContext();
+
+        TransferDTO transferDTO = TransferDTO.builder().amount(BigDecimal.TEN).fromCardId(id).toCardId(id2).build();
+
+        assertThrows(ValidationException.class, () -> cardService.transfer(transferDTO));
+    }
+
+    @Test
+    void testTransferWhenCorrect_ShouldCallConverterAndSaveAndChangeBalance(){
+        User user = User.builder().id(id).build();
+
+        doAnswer(answer -> Optional.of(Card.builder().id(answer.getArgument(0)).balance(BigDecimal.TEN).owner(User.builder().id(id).build()).build())).when(cardRepository).findById(any());
+        doReturn(user).when(userDetailsHolder).getUserFromSecurityContext();
+        doAnswer(answer -> answer.getArgument(0)).when(cardRepository).save(any());
+        doAnswer(answer -> CardDTO.builder().balance(((Card)answer.getArgument(0)).getBalance()).build()).when(cardConverter).convert(any());
+
+        TransferDTO transferDTO = TransferDTO.builder().amount(BigDecimal.ONE).fromCardId(id).toCardId(id2).build();
+
+        List<CardDTO> actual = cardService.transfer(transferDTO);
+
+        assertEquals(BigDecimal.TEN.subtract(BigDecimal.ONE), actual.get(0).getBalance());
+        assertEquals(BigDecimal.TEN.add(BigDecimal.ONE), actual.get(1).getBalance());
+        verify(cardRepository, times(2)).save(any());
+        verify(cardConverter, times(2)).convert(any());
+    }
+
+    @Test
+    void testCheckOwnerOrThrowExceptionWhenCardNotBelongUser_ShouldThrowValidationException(){
+        Card card = Card.builder().id(id).owner(User.builder().id(id).build()).build();
+
+        assertThrows(ValidationException.class, () -> cardService.checkOwnerOrThrowException(card, id2));
+    }
+
+    @Test
+    void testCheckOwnerOrThrowExceptionWhenCardBelongsUser_ShouldReturnNothing(){
+        Card card = Card.builder().id(id).owner(User.builder().id(id).build()).build();
+
+        assertDoesNotThrow(() -> cardService.checkOwnerOrThrowException(card, id));
+    }
+
+    @Test
+    void testGetCardsLikeAdminWhenCorrect_ShouldCallConverterAndFindAll(){
+        doNothing().when(pageSizeAndNumberValidator).validateOrThrowValidationException(anyInt(), anyInt());
+
+        doReturn(Page.empty()).when(cardRepository).findAll(any(Specification.class), any(Pageable.class));
+
+        cardService.getCardsLikeAdmin(0, 1, null);
+
+        verify(cardPageConverter).convert(any());
+        verify(cardRepository).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void testGetCardsLikeUserWhenCorrect_ShouldCallConverterAndFindAll(){
+        doNothing().when(pageSizeAndNumberValidator).validateOrThrowValidationException(anyInt(), anyInt());
+
+        doReturn(Page.empty()).when(cardRepository).findAll(any(Specification.class), any(Pageable.class));
+
+        cardService.getCardsLikeUser(0, 1, null);
+
+        verify(cardPageConverter).convert(any());
+        verify(cardRepository).findAll(any(Specification.class), any(Pageable.class));
+    }
+
+    @Test
+    void testGetCardLikeUserWhenCorrect_ShouldCallConverter(){
+        User user = User.builder().id(id).build();
+        doReturn(user).when(userDetailsHolder).getUserFromSecurityContext();
+        doReturn(Optional.of(Card.builder().id(id).owner(user).build())).when(cardRepository).findById(any());
+
+        cardService.getCardLikeUser(id);
+
+        verify(cardConverter).convert(any());
     }
 }
