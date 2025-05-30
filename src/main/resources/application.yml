@@ -4,6 +4,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/bankcards
     username: postgres
     password: postgres
+  web:
+    resources:
+      static-locations: file:./docs/
+
 
   jpa:
     properties:
@@ -29,7 +33,7 @@ springdoc:
     path: /api/docs
   swagger-ui:
     path: /api/docs/swagger
-    operations-sorter: alpha
+    url: /openapi.yaml
 
 cors:
   allowedOrigins: http://localhost:3000,http://localhost:8080

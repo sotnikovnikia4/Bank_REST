@@ -50,9 +50,7 @@ public class SecurityConfig{
                                 .requestMatchers(
                                         "/api/auth/registration",
                                         "/api/auth/",
-                                        "/api/cards",
-                                        "/api/cards/*/activate",
-                                        "/api/cards/*/block",
+                                        "/api/cards/**",
                                         "/api/users/**"
                                 ).hasRole(RoleService.ADMIN_ROLE)
                                 .anyRequest().permitAll()
